@@ -18,10 +18,11 @@ different endpoint is purely a matter of ``base_url`` / ``api_key`` / ``model``
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from openai import OpenAI
+from openai import APIError, OpenAI
 
 from .config import ModelConfig
 from .mcp import McpClient, ToolResult, mcp_tools_to_openai, parse_tool_arguments
@@ -186,7 +187,14 @@ async def _agent_turn(
     """Run the agent until it produces a plain-text reply, executing tools."""
 
     for _ in range(_MAX_TOOL_ITERS):
-        msg = await _complete(agent, messages, tools)
+        try:
+            msg = await _complete(agent, messages, tools)
+        except APIError as exc:
+            # A weaker model can emit tool-call output that the serving stack's
+            # tool-call parser rejects (e.g. vLLM's lfm2 parser returning a 400 on
+            # truncated JSON). Treat that as a failed agent turn rather than
+            # crashing the whole eval; the grader then records the honest failure.
+            return f"(agent request failed: {exc})"
         messages.append(_assistant_to_message(msg))
 
         tool_calls = getattr(msg, "tool_calls", None)
@@ -194,7 +202,30 @@ async def _agent_turn(
             return msg.content or ""
 
         for tc in tool_calls:
-            args = parse_tool_arguments(tc.function.arguments)
+            try:
+                args = parse_tool_arguments(tc.function.arguments)
+            except (ValueError, json.JSONDecodeError) as exc:
+                # A weaker model can emit malformed JSON arguments (truncated
+                # strings, etc.). Treat that as a failed tool call — record it and
+                # hand the error back to the agent so it can retry — rather than
+                # crashing the whole eval run.
+                detail = f"Invalid tool arguments: {exc}. Arguments must be a single valid JSON object."
+                captured.append(
+                    ToolResult(
+                        name=tc.function.name,
+                        arguments={},
+                        text=detail,
+                        is_error=True,
+                    )
+                )
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc.id,
+                        "content": detail,
+                    }
+                )
+                continue
             result = await mcp.call_tool(tc.function.name, args)
             captured.append(result)
             messages.append(
