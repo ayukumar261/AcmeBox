@@ -29,7 +29,7 @@ class DbCheck(BaseModel):
     expect: dict[str, Any]
 
 
-class ActionCheck(BaseModel):
+class ToolCheck(BaseModel):
     """Require that a tool was called with (at least) these arguments.
 
     ``args`` is subset-matched against the captured call, including the nested
@@ -42,7 +42,7 @@ class ActionCheck(BaseModel):
 
 class EvaluationCriteria(BaseModel):
     db_check: list[DbCheck] = Field(default_factory=list)
-    actions: list[ActionCheck] = Field(default_factory=list)
+    tools: list[ToolCheck] = Field(default_factory=list)
 
 
 class UserSpec(BaseModel):

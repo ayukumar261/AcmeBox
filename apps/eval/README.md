@@ -57,7 +57,7 @@ Drop a JSON file in `src/tasks/`:
   during seed, so order doesn't matter).
 - `user.instructions` — the persona/goal for the simulated customer.
 - `evaluation_criteria.db_check` — expected final column values (the truth).
-- `evaluation_criteria.actions` — required tool calls (subset-matched, including
+- `evaluation_criteria.tools` — required tool calls (subset-matched, including
   the nested `path`/`payload` shape MCP tools use).
 
 See `tasks/update_default_address.json` for a worked example.

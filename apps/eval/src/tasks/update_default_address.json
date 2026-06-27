@@ -47,7 +47,7 @@
         "expect": { "default_address_id": "addr_new" }
       }
     ],
-    "actions": [
+    "tools": [
       {
         "tool": "addresses_setDefault",
         "args": {

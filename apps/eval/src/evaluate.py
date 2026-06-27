@@ -6,7 +6,7 @@ Grading is two pure checks (no model calls):
    conversation and confirm the expected columns. Catches agents that *say* they
    did something but didn't, and agents that reached the right state the wrong way
    (e.g. by deleting/recreating instead of updating).
-2. ``actions`` -- confirm the required tool(s) were actually called with the
+2. ``tools`` -- confirm the required tool(s) were actually called with the
    expected arguments (subset match, including the nested path/payload shape).
 
 A run passes only if every check passes. ``run_task`` then repeats the whole
@@ -28,7 +28,7 @@ from .config import HarnessConfig, agent_model, user_model
 from .conversation import LLM, Conversation, run_conversation
 from .harness import ephemeral_db
 from .mcp import ToolResult, mcp_session
-from .tasks.models import ActionCheck, DbCheck, EvaluationCriteria, Task
+from .tasks.models import DbCheck, EvaluationCriteria, Task, ToolCheck
 
 # --- Deterministic checks ----------------------------------------------------
 
@@ -104,23 +104,23 @@ def check_db(db_url: str, checks: list[DbCheck]) -> list[CheckResult]:
     return results
 
 
-def check_actions(
-    captured: list[ToolResult], actions: list[ActionCheck]
+def check_tools(
+    captured: list[ToolResult], tools: list[ToolCheck]
 ) -> list[CheckResult]:
     results: list[CheckResult] = []
-    for action in actions:
+    for check in tools:
         match = any(
-            call.name == action.tool and _is_subset(action.args, call.arguments)
+            call.name == check.tool and _is_subset(check.args, call.arguments)
             for call in captured
         )
         results.append(
             CheckResult(
-                name=f"tool:{action.tool}",
+                name=f"tool:{check.tool}",
                 passed=match,
                 detail=(
                     "called with expected args"
                     if match
-                    else f"no matching call (args {action.args!r})"
+                    else f"no matching call (args {check.args!r})"
                 ),
             )
         )
@@ -134,7 +134,7 @@ def grade(
 ) -> RunResult:
     result = RunResult()
     result.checks.extend(check_db(db_url, criteria.db_check))
-    result.checks.extend(check_actions(captured, criteria.actions))
+    result.checks.extend(check_tools(captured, criteria.tools))
     return result
 
 
