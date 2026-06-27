@@ -1,0 +1,27 @@
+meta {
+  name: Get Meal Not Found
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/meals/meal_does-not-exist
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq MealNotFound
+}
+
+tests {
+  test("responds with 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns the MealNotFound error", function () {
+    expect(res.getBody()._tag).to.equal("MealNotFound");
+    expect(res.getBody().mealId).to.equal("meal_does-not-exist");
+  });
+}

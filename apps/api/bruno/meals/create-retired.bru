@@ -1,0 +1,40 @@
+meta {
+  name: Create Retired Meal
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Discontinued Winter Stew",
+    "steps": ["Brown the beef.", "Simmer with root vegetables for 2 hours."],
+    "ingredients": ["500g beef", "2 carrots", "1 parsnip", "1 onion"],
+    "isActive": false
+  }
+}
+
+script:post-response {
+  bru.setVar("retiredMealId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.isActive: eq false
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("create honors an explicit isActive: false", function () {
+    expect(res.getBody().id).to.match(/^meal_/);
+    expect(res.getBody().isActive).to.equal(false);
+  });
+}

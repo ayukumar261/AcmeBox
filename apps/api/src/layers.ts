@@ -5,6 +5,8 @@ import { AddressesLive } from "./modules/addresses/handlers.js";
 import { AddressesRepository } from "./modules/addresses/repository.js";
 import { CustomersLive } from "./modules/customers/handlers.js";
 import { CustomersRepository } from "./modules/customers/repository.js";
+import { MealsLive } from "./modules/meals/handlers.js";
+import { MealsRepository } from "./modules/meals/repository.js";
 import { PaymentMethodsLive } from "./modules/payment-methods/handlers.js";
 import { PaymentMethodsRepository } from "./modules/payment-methods/repository.js";
 import { PlansLive } from "./modules/plans/handlers.js";
@@ -31,10 +33,12 @@ export const ApiLive = HttpApiBuilder.api(Api).pipe(
   Layer.provide(AddressesLive),
   Layer.provide(PaymentMethodsLive),
   Layer.provide(PlansLive),
+  Layer.provide(MealsLive),
   Layer.provide(SubscriptionsLive),
   Layer.provide(CustomersRepository.Default),
   Layer.provide(AddressesRepository.Default),
   Layer.provide(PaymentMethodsRepository.Default),
   Layer.provide(PlansRepository.Default),
+  Layer.provide(MealsRepository.Default),
   Layer.provide(SubscriptionsRepository.Default),
 );

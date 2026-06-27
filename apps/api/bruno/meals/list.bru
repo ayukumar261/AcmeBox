@@ -1,0 +1,33 @@
+meta {
+  name: List Meals
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/meals?isActive=true
+  body: none
+  auth: none
+}
+
+params:query {
+  isActive: true
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("active meals include the one we created", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array");
+    const ids = body.map((m) => m.id);
+    expect(ids).to.include(bru.getVar("mealId"));
+    expect(body.every((m) => m.isActive === true)).to.equal(true);
+  });
+}

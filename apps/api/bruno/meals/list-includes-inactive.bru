@@ -1,0 +1,31 @@
+meta {
+  name: List Includes Inactive
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/meals?isActive=false
+  body: none
+  auth: none
+}
+
+params:query {
+  isActive: false
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("the retired meal shows up when filtering isActive=false", function () {
+    const match = res.getBody().find((m) => m.id === bru.getVar("retiredMealId"));
+    expect(match, "retired meal present").to.not.equal(undefined);
+    expect(match.isActive).to.equal(false);
+  });
+}

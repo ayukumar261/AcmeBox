@@ -1,0 +1,64 @@
+meta {
+  name: Create Meal
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Sheet-Pan Chicken Fajitas",
+    "steps": [
+      "Slice the peppers and onion.",
+      "Toss with chicken and spices on a sheet pan.",
+      "Roast at 220C for 20 minutes."
+    ],
+    "ingredients": [
+      "2 chicken breasts",
+      "3 bell peppers",
+      "1 onion",
+      "2 tbsp fajita seasoning"
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("mealId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.isActive: eq true
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded meal id", function () {
+    expect(res.getBody().id).to.match(/^meal_/);
+  });
+
+  test("new meals default to active and round-trip the recipe", function () {
+    const body = res.getBody();
+    expect(body.isActive).to.equal(true);
+    expect(body.name).to.equal("Sheet-Pan Chicken Fajitas");
+    expect(body.steps).to.eql([
+      "Slice the peppers and onion.",
+      "Toss with chicken and spices on a sheet pan.",
+      "Roast at 220C for 20 minutes.",
+    ]);
+    expect(body.ingredients).to.eql([
+      "2 chicken breasts",
+      "3 bell peppers",
+      "1 onion",
+      "2 tbsp fajita seasoning",
+    ]);
+  });
+}

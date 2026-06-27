@@ -1,0 +1,28 @@
+meta {
+  name: Get Meal By Id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/meals/{{mealId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{mealId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the canonical meal record", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("mealId"));
+    expect(res.getBody().name).to.equal("Sheet-Pan Chicken Fajitas");
+    expect(res.getBody().ingredients).to.be.an("array");
+  });
+}

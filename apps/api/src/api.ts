@@ -2,6 +2,7 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
 import { AddressesGroup } from "./modules/addresses/group.js";
 import { CustomersGroup } from "./modules/customers/group.js";
+import { MealsGroup } from "./modules/meals/group.js";
 import { PaymentMethodsGroup } from "./modules/payment-methods/group.js";
 import { PlansGroup } from "./modules/plans/group.js";
 import { SubscriptionsGroup } from "./modules/subscriptions/group.js";
@@ -27,4 +28,5 @@ export const Api = HttpApi.make("AcmeBoxApi")
   .add(AddressesGroup)
   .add(PaymentMethodsGroup)
   .add(PlansGroup)
+  .add(MealsGroup)
   .add(SubscriptionsGroup);
