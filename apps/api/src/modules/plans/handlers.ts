@@ -1,6 +1,6 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { Effect } from "effect";
-import { Api } from "../api.js";
+import { Api } from "../../api.js";
 import { PlansRepository } from "./repository.js";
 
 export const PlansLive = HttpApiBuilder.group(Api, "plans", (handlers) =>

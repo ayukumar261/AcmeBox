@@ -7,16 +7,16 @@ import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
 import { Effect, Layer } from "effect";
 import { createServer } from "node:http";
 import { Api } from "./api.js";
-import { AddressesLive } from "./addresses/handlers.js";
-import { AddressesRepository } from "./addresses/repository.js";
-import { CustomersLive } from "./customers/handlers.js";
-import { CustomersRepository } from "./customers/repository.js";
-import { PaymentMethodsLive } from "./payment-methods/handlers.js";
-import { PaymentMethodsRepository } from "./payment-methods/repository.js";
-import { PlansLive } from "./plans/handlers.js";
-import { PlansRepository } from "./plans/repository.js";
-import { SubscriptionsLive } from "./subscriptions/handlers.js";
-import { SubscriptionsRepository } from "./subscriptions/repository.js";
+import { AddressesLive } from "./modules/addresses/handlers.js";
+import { AddressesRepository } from "./modules/addresses/repository.js";
+import { CustomersLive } from "./modules/customers/handlers.js";
+import { CustomersRepository } from "./modules/customers/repository.js";
+import { PaymentMethodsLive } from "./modules/payment-methods/handlers.js";
+import { PaymentMethodsRepository } from "./modules/payment-methods/repository.js";
+import { PlansLive } from "./modules/plans/handlers.js";
+import { PlansRepository } from "./modules/plans/repository.js";
+import { SubscriptionsLive } from "./modules/subscriptions/handlers.js";
+import { SubscriptionsRepository } from "./modules/subscriptions/repository.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 

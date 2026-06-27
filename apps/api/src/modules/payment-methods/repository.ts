@@ -1,7 +1,7 @@
 import { SqlClient } from "@effect/sql";
 import { Effect } from "effect";
 import { randomUUID } from "node:crypto";
-import { DatabaseLive } from "../db/Database.js";
+import { DatabaseLive } from "../../db/Database.js";
 import { CustomersRepository } from "../customers/repository.js";
 import {
   type CreatePaymentMethodPayload,

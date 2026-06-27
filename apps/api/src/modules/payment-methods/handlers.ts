@@ -1,6 +1,6 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { Effect } from "effect";
-import { Api } from "../api.js";
+import { Api } from "../../api.js";
 import { PaymentMethodsRepository } from "./repository.js";
 
 export const PaymentMethodsLive = HttpApiBuilder.group(

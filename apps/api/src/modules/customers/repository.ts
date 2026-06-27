@@ -6,7 +6,7 @@ import {
   type PaymentMethodRow,
   toPaymentMethod,
 } from "../payment-methods/row.js";
-import { DatabaseLive } from "../db/Database.js";
+import { DatabaseLive } from "../../db/Database.js";
 import {
   type Address,
   type AddressId,

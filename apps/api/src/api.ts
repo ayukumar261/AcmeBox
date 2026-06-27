@@ -1,10 +1,10 @@
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
-import { AddressesGroup } from "./addresses/group.js";
-import { CustomersGroup } from "./customers/group.js";
-import { PaymentMethodsGroup } from "./payment-methods/group.js";
-import { PlansGroup } from "./plans/group.js";
-import { SubscriptionsGroup } from "./subscriptions/group.js";
+import { AddressesGroup } from "./modules/addresses/group.js";
+import { CustomersGroup } from "./modules/customers/group.js";
+import { PaymentMethodsGroup } from "./modules/payment-methods/group.js";
+import { PlansGroup } from "./modules/plans/group.js";
+import { SubscriptionsGroup } from "./modules/subscriptions/group.js";
 
 // --- Schemas -----------------------------------------------------------------
 
