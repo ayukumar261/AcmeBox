@@ -5,7 +5,7 @@
 # Point apps/eval's AGENT_BASE_URL at  http://<pod-ip>:${SERVE_PORT}/v1
 # and AGENT_MODEL at the BASE_MODEL id below.
 #
-# Usage (on the pod, inside apps/model/):
+# Usage (on the pod, inside apps/llm/):
 #   scripts/serve.sh
 set -euo pipefail
 

@@ -1,5 +1,5 @@
 [project]
-name = "acmebox-model"
+name = "acmebox-llm"
 version = "0.1.0"
 description = "vLLM serving for the AcmeBox agent-under-test: an OpenAI-compatible LFM2.5 endpoint running on a RunPod GPU."
 authors = [{ name = "AcmeBox" }]

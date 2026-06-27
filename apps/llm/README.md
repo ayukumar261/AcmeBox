@@ -1,4 +1,4 @@
-# AcmeBox Model (`apps/model`)
+# AcmeBox LLM (`apps/llm`)
 
 vLLM serving for the **agent-under-test** in the continual-learning hackathon. The
 model is **Liquid `LFM2.5-1.2B-Instruct`**, served as an **OpenAI-compatible**
@@ -9,7 +9,7 @@ endpoint that [`apps/eval`](../eval) points its `AGENT_BASE_URL` at.
 ```
   your laptop (this monorepo)            RunPod GPU pod (L4 / 24GB)
   ───────────────────────────            ──────────────────────────
-  edit apps/model/* + push   ──git──▶     git pull on the pod
+  edit apps/llm/* + push     ──git──▶     git pull on the pod
                                               │
                                               ├─ scripts/setup.sh   (once: installs vLLM)
                                               └─ scripts/serve.sh   (vLLM :8000)
@@ -33,7 +33,7 @@ the pod's **Connect** panel — either the direct TCP form (`ssh -i
 
 ```bash
 git clone <repo-url> /workspace/AcmeBox   # or: cd /workspace/AcmeBox && git pull
-cd /workspace/AcmeBox/apps/model
+cd /workspace/AcmeBox/apps/llm
 cp .env.example .env         # adjust BASE_MODEL / serving vars if needed
 bash scripts/setup.sh        # installs vLLM (>=0.23)
 ```
