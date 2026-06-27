@@ -49,6 +49,7 @@ export const Address = Schema.Struct({
   country: CountryCode,
   deliveryNotes: Schema.optional(Schema.String),
 });
+export type Address = typeof Address.Type;
 
 export const PaymentMethod = Schema.Struct({
   id: PaymentMethodId,
@@ -57,6 +58,7 @@ export const PaymentMethod = Schema.Struct({
   expiryMonth: Schema.Number,
   expiryYear: Schema.Number,
 });
+export type PaymentMethod = typeof PaymentMethod.Type;
 
 // --- Canonical record --------------------------------------------------------
 
@@ -121,6 +123,37 @@ export const CustomerListQuery = Schema.Struct({
 });
 export type CustomerListQuery = typeof CustomerListQuery.Type;
 
+// --- Address request payloads ------------------------------------------------
+
+export const CreateAddressPayload = Schema.Struct({
+  line1: Schema.String,
+  line2: Schema.optional(Schema.String),
+  city: Schema.String,
+  region: Schema.String,
+  postalCode: Schema.String,
+  country: CountryCode,
+  deliveryNotes: Schema.optional(Schema.String),
+});
+export type CreateAddressPayload = typeof CreateAddressPayload.Type;
+
+/** Every field optional — send only what changed. */
+export const UpdateAddressPayload = Schema.Struct({
+  line1: Schema.optional(Schema.String),
+  line2: Schema.optional(Schema.String),
+  city: Schema.optional(Schema.String),
+  region: Schema.optional(Schema.String),
+  postalCode: Schema.optional(Schema.String),
+  country: Schema.optional(CountryCode),
+  deliveryNotes: Schema.optional(Schema.String),
+});
+export type UpdateAddressPayload = typeof UpdateAddressPayload.Type;
+
+/** Body for `PUT /customers/:customerId/default-address`. */
+export const SetDefaultAddressPayload = Schema.Struct({
+  addressId: AddressId,
+});
+export type SetDefaultAddressPayload = typeof SetDefaultAddressPayload.Type;
+
 // --- Errors ------------------------------------------------------------------
 
 export class CustomerNotFound extends Schema.TaggedError<CustomerNotFound>()(
@@ -131,4 +164,9 @@ export class CustomerNotFound extends Schema.TaggedError<CustomerNotFound>()(
 export class EmailAlreadyExists extends Schema.TaggedError<EmailAlreadyExists>()(
   "EmailAlreadyExists",
   { email: Schema.String },
+) {}
+
+export class AddressNotFound extends Schema.TaggedError<AddressNotFound>()(
+  "AddressNotFound",
+  { customerId: Schema.String, addressId: Schema.String },
 ) {}

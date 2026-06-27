@@ -1,0 +1,21 @@
+meta {
+  name: Delete Address
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses/{{addressId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}
+
+tests {
+  test("responds with 204 No Content", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Customer Embeds Address
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.defaultAddressId: eq {{addressId}}
+}
+
+tests {
+  test("GET /customers hydrates the address", function () {
+    const b = res.getBody();
+    expect(b.addresses).to.be.an("array").with.lengthOf(1);
+    expect(b.addresses[0].id).to.equal(bru.getVar("addressId"));
+    expect(b.addresses[0].line2).to.equal("Floor 5");
+    expect(b.defaultAddressId).to.equal(bru.getVar("addressId"));
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: List Addresses
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the address we added", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array").with.lengthOf(1);
+    expect(body[0].id).to.equal(bru.getVar("addressId"));
+    expect(body[0].city).to.equal("Boston");
+  });
+}

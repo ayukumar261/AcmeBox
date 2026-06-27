@@ -1,0 +1,24 @@
+meta {
+  name: Delete Missing Address
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses/{{addressId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq AddressNotFound
+}
+
+tests {
+  test("deleting an already-removed address is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+    expect(res.getBody()._tag).to.equal("AddressNotFound");
+    expect(res.getBody().addressId).to.equal(bru.getVar("addressId"));
+  });
+}

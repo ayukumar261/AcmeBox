@@ -1,8 +1,10 @@
 import { SqlClient } from "@effect/sql";
 import { Effect } from "effect";
 import { randomUUID } from "node:crypto";
+import { type AddressRow, toAddress } from "../addresses/row.js";
 import { DatabaseLive } from "../db/Database.js";
 import {
+  type Address,
   type AddressId,
   type CreateCustomerPayload,
   type Customer,
@@ -37,10 +39,13 @@ interface CustomerRow {
 const toIso = (value: Date | string): string =>
   (value instanceof Date ? value : new Date(value)).toISOString();
 
-// Map a row to the canonical record. Addresses and payment methods are empty
-// until their own endpoints exist; optional fields are omitted when null so the
-// JSON stays clean.
-const toCustomer = (row: CustomerRow): Customer => ({
+// Map a row plus its loaded addresses to the canonical record. Payment methods
+// stay empty until their own endpoints exist; optional fields are omitted when
+// null so the JSON stays clean.
+const toCustomer = (
+  row: CustomerRow,
+  addresses: ReadonlyArray<Address>,
+): Customer => ({
   id: row.id as CustomerId,
   email: row.email,
   emailVerified: row.email_verified,
@@ -56,7 +61,7 @@ const toCustomer = (row: CustomerRow): Customer => ({
   ...(row.subscription_id !== null
     ? { subscriptionId: row.subscription_id as SubscriptionId }
     : {}),
-  addresses: [],
+  addresses,
   ...(row.default_address_id !== null
     ? { defaultAddressId: row.default_address_id as AddressId }
     : {}),
@@ -73,6 +78,17 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
     effect: Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient;
 
+      // Load a row's owned addresses and assemble the canonical record.
+      const hydrate = (row: CustomerRow) =>
+        Effect.gen(function* () {
+          const addressRows = yield* sql<AddressRow>`
+            SELECT * FROM addresses
+            WHERE customer_id = ${row.id}
+            ORDER BY created_at ASC
+          `;
+          return toCustomer(row, addressRows.map(toAddress));
+        });
+
       const findById = (id: CustomerId) =>
         Effect.gen(function* () {
           const rows = yield* sql<CustomerRow>`
@@ -82,7 +98,7 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
           if (row === undefined) {
             return yield* new CustomerNotFound({ customerId: id });
           }
-          return toCustomer(row);
+          return yield* hydrate(row);
         }).pipe(Effect.catchTag("SqlError", Effect.die));
 
       const list = (query: CustomerListQuery) =>
@@ -100,7 +116,7 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
           const rows = yield* sql<CustomerRow>`
             SELECT * FROM customers ${where} ORDER BY created_at DESC LIMIT 100
           `;
-          return rows.map(toCustomer);
+          return yield* Effect.forEach(rows, hydrate);
         }).pipe(Effect.catchTag("SqlError", Effect.die));
 
       const create = (payload: CreateCustomerPayload) =>
@@ -128,7 +144,7 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
           const rows = yield* sql<CustomerRow>`
             SELECT * FROM customers WHERE id = ${id}
           `;
-          return toCustomer(rows[0]!);
+          return yield* hydrate(rows[0]!);
         }).pipe(Effect.catchTag("SqlError", Effect.die));
 
       const update = (id: CustomerId, patch: UpdateCustomerPayload) =>
@@ -157,7 +173,7 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
           const updated = yield* sql<CustomerRow>`
             SELECT * FROM customers WHERE id = ${id}
           `;
-          return toCustomer(updated[0]!);
+          return yield* hydrate(updated[0]!);
         }).pipe(Effect.catchTag("SqlError", Effect.die));
 
       return { findById, list, create, update } as const;

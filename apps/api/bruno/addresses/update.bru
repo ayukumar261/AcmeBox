@@ -1,0 +1,41 @@
+meta {
+  name: Update Address
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses/{{addressId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "line2": "Floor 5",
+    "deliveryNotes": "Ring the bell twice"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.line2: eq Floor 5
+  res.body.deliveryNotes: eq Ring the bell twice
+  res.body.line1: eq 1 Federal Street
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("applies the patched fields", function () {
+    expect(res.getBody().line2).to.equal("Floor 5");
+    expect(res.getBody().deliveryNotes).to.equal("Ring the bell twice");
+  });
+
+  test("leaves untouched fields alone", function () {
+    expect(res.getBody().line1).to.equal("1 Federal Street");
+    expect(res.getBody().city).to.equal("Boston");
+  });
+}

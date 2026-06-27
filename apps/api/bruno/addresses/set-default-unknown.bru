@@ -1,0 +1,30 @@
+meta {
+  name: Set Default Unknown Address
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/default-address
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "addressId": "adr_does-not-exist"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq AddressNotFound
+}
+
+tests {
+  test("rejects an address that isn't the customer's", function () {
+    expect(res.getStatus()).to.equal(404);
+    expect(res.getBody()._tag).to.equal("AddressNotFound");
+    expect(res.getBody().addressId).to.equal("adr_does-not-exist");
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: List After Delete
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("address list is empty", function () {
+    expect(res.getBody()).to.be.an("array").that.is.empty;
+  });
+}

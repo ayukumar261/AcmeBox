@@ -1,0 +1,23 @@
+meta {
+  name: Default Cleared On Delete
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("default address pointer was cleared", function () {
+    // The FK is ON DELETE SET NULL, so removing the default clears the pointer.
+    expect(res.getBody().defaultAddressId).to.equal(undefined);
+    expect(res.getBody().addresses).to.be.an("array").that.is.empty;
+  });
+}

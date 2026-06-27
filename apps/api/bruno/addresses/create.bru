@@ -1,0 +1,53 @@
+meta {
+  name: Add Address
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/addresses
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "line1": "1 Federal Street",
+    "line2": "Suite 200",
+    "city": "Boston",
+    "region": "MA",
+    "postalCode": "02110",
+    "country": "US",
+    "deliveryNotes": "Leave at side door"
+  }
+}
+
+script:post-response {
+  bru.setVar("addressId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.line1: eq 1 Federal Street
+  res.body.city: eq Boston
+  res.body.deliveryNotes: eq Leave at side door
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded address id", function () {
+    expect(res.getBody().id).to.be.a("string");
+    expect(res.getBody().id).to.match(/^adr_/);
+  });
+
+  test("echoes the submitted fields", function () {
+    const b = res.getBody();
+    expect(b.line2).to.equal("Suite 200");
+    expect(b.region).to.equal("MA");
+    expect(b.postalCode).to.equal("02110");
+    expect(b.deliveryNotes).to.equal("Leave at side door");
+  });
+}

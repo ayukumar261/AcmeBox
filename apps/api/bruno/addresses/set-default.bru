@@ -1,0 +1,39 @@
+meta {
+  name: Set Default Address
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/customers/{{addrCustomerId}}/default-address
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "addressId": "{{addressId}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.defaultAddressId: eq {{addressId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the customer with the default set", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("addrCustomerId"));
+    expect(res.getBody().defaultAddressId).to.equal(bru.getVar("addressId"));
+  });
+
+  test("customer now embeds the address", function () {
+    const addresses = res.getBody().addresses;
+    expect(addresses).to.be.an("array").with.lengthOf(1);
+    expect(addresses[0].id).to.equal(bru.getVar("addressId"));
+  });
+}
