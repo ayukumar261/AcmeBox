@@ -17,5 +17,17 @@ services:
       timeout: 5s
       retries: 5
 
+  pgweb:
+    image: sosedoff/pgweb:latest
+    container_name: acmebox-pgweb
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-acmebox}?sslmode=disable
+    ports:
+      - "${PGWEB_PORT:-8085}:8081"
+
 volumes:
   acmebox-pgdata:
