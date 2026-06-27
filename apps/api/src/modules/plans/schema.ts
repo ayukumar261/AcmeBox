@@ -24,7 +24,7 @@ export type Currency = typeof Currency.Type;
 // imports PlanId from here, never the other way around.
 
 /** Recipes shipped per week. */
-export const MealsPerWeek = Schema.Literal(2, 3, 4, 5);
+export const MealsPerWeek = Schema.Literal(2, 4, 6, 8);
 export type MealsPerWeek = typeof MealsPerWeek.Type;
 
 /** Servings per recipe. */
