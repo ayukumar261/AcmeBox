@@ -1,0 +1,29 @@
+meta {
+  name: List Payment Methods
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/payment-methods
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the card we added", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array").with.lengthOf(1);
+    expect(body[0].id).to.equal(bru.getVar("paymentMethodId"));
+    expect(body[0].brand).to.equal("visa");
+    expect(body[0].last4).to.equal("4242");
+  });
+}

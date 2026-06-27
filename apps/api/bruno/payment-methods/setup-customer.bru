@@ -1,0 +1,48 @@
+meta {
+  name: Setup Customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{pmEmail}}",
+    "firstName": "Katherine",
+    "lastName": "Johnson",
+    "locale": "en-US",
+    "timezone": "America/New_York",
+    "country": "US"
+  }
+}
+
+script:pre-request {
+  // Self-contained: this folder owns its own customer so it can run on its own.
+  bru.setVar("pmEmail", `pm-${Date.now()}@example.com`);
+}
+
+script:post-response {
+  bru.setVar("pmCustomerId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.paymentMethods: isEmpty
+}
+
+tests {
+  test("creates the fixture customer", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^cus_/);
+  });
+
+  test("starts with no payment methods", function () {
+    expect(res.getBody().paymentMethods).to.be.an("array").that.is.empty;
+    expect(res.getBody().defaultPaymentMethodId).to.equal(undefined);
+  });
+}

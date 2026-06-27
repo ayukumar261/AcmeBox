@@ -1,0 +1,54 @@
+meta {
+  name: Add Payment Method
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/payment-methods
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "brand": "visa",
+    "last4": "4242",
+    "expiryMonth": 12,
+    "expiryYear": 2030
+  }
+}
+
+script:post-response {
+  bru.setVar("paymentMethodId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.brand: eq visa
+  res.body.last4: eq "4242"
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded payment-method id", function () {
+    expect(res.getBody().id).to.be.a("string");
+    expect(res.getBody().id).to.match(/^pm_/);
+  });
+
+  test("returns only the tokenized summary (no PAN)", function () {
+    // brand + last4 + expiry only — never a full card number.
+    expect(res.getBody()).to.have.all.keys(
+      "id",
+      "brand",
+      "last4",
+      "expiryMonth",
+      "expiryYear",
+    );
+    expect(res.getBody().expiryMonth).to.equal(12);
+    expect(res.getBody().expiryYear).to.equal(2030);
+  });
+}

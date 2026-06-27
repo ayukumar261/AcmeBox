@@ -1,0 +1,21 @@
+meta {
+  name: Delete Payment Method
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/payment-methods/{{paymentMethodId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}
+
+tests {
+  test("responds with 204 No Content", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

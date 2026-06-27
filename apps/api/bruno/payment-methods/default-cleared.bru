@@ -1,0 +1,23 @@
+meta {
+  name: Default Cleared On Delete
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("default payment-method pointer was cleared", function () {
+    // The FK is ON DELETE SET NULL, so removing the default clears the pointer.
+    expect(res.getBody().defaultPaymentMethodId).to.equal(undefined);
+    expect(res.getBody().paymentMethods).to.be.an("array").that.is.empty;
+  });
+}

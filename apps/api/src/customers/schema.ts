@@ -154,6 +154,30 @@ export const SetDefaultAddressPayload = Schema.Struct({
 });
 export type SetDefaultAddressPayload = typeof SetDefaultAddressPayload.Type;
 
+// --- Payment method request payloads -----------------------------------------
+
+/** Cards are immutable tokens — created and removed, never edited — so there is
+ *  no update payload. The full PAN never reaches us; only this summary does. */
+export const CreatePaymentMethodPayload = Schema.Struct({
+  brand: Card,
+  last4: Schema.String.pipe(
+    Schema.pattern(/^\d{4}$/, {
+      message: () => "must be exactly 4 digits",
+    }),
+  ),
+  expiryMonth: Schema.Number.pipe(Schema.int(), Schema.between(1, 12)),
+  expiryYear: Schema.Number.pipe(Schema.int(), Schema.between(2000, 2100)),
+});
+export type CreatePaymentMethodPayload =
+  typeof CreatePaymentMethodPayload.Type;
+
+/** Body for `PUT /customers/:customerId/default-payment-method`. */
+export const SetDefaultPaymentMethodPayload = Schema.Struct({
+  paymentMethodId: PaymentMethodId,
+});
+export type SetDefaultPaymentMethodPayload =
+  typeof SetDefaultPaymentMethodPayload.Type;
+
 // --- Errors ------------------------------------------------------------------
 
 export class CustomerNotFound extends Schema.TaggedError<CustomerNotFound>()(
@@ -169,4 +193,9 @@ export class EmailAlreadyExists extends Schema.TaggedError<EmailAlreadyExists>()
 export class AddressNotFound extends Schema.TaggedError<AddressNotFound>()(
   "AddressNotFound",
   { customerId: Schema.String, addressId: Schema.String },
+) {}
+
+export class PaymentMethodNotFound extends Schema.TaggedError<PaymentMethodNotFound>()(
+  "PaymentMethodNotFound",
+  { customerId: Schema.String, paymentMethodId: Schema.String },
 ) {}

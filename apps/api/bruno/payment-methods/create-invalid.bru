@@ -1,0 +1,31 @@
+meta {
+  name: Add Payment Method Invalid
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/payment-methods
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "brand": "visa",
+    "last4": "42",
+    "expiryMonth": 13,
+    "expiryYear": 2030
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("rejects a bad last4 / month with 400", function () {
+    // last4 must be 4 digits and month must be 1-12.
+    expect(res.getStatus()).to.equal(400);
+  });
+}

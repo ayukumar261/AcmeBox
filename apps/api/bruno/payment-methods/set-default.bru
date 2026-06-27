@@ -1,0 +1,42 @@
+meta {
+  name: Set Default Payment Method
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/default-payment-method
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "paymentMethodId": "{{paymentMethodId}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.defaultPaymentMethodId: eq {{paymentMethodId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the customer with the default set", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("pmCustomerId"));
+    expect(res.getBody().defaultPaymentMethodId).to.equal(
+      bru.getVar("paymentMethodId"),
+    );
+  });
+
+  test("customer now embeds the card", function () {
+    const cards = res.getBody().paymentMethods;
+    expect(cards).to.be.an("array").with.lengthOf(1);
+    expect(cards[0].id).to.equal(bru.getVar("paymentMethodId"));
+    expect(cards[0].last4).to.equal("4242");
+  });
+}

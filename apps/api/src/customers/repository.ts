@@ -2,6 +2,10 @@ import { SqlClient } from "@effect/sql";
 import { Effect } from "effect";
 import { randomUUID } from "node:crypto";
 import { type AddressRow, toAddress } from "../addresses/row.js";
+import {
+  type PaymentMethodRow,
+  toPaymentMethod,
+} from "../payment-methods/row.js";
 import { DatabaseLive } from "../db/Database.js";
 import {
   type Address,
@@ -12,6 +16,7 @@ import {
   CustomerNotFound,
   type CustomerListQuery,
   EmailAlreadyExists,
+  type PaymentMethod,
   type PaymentMethodId,
   type SubscriptionId,
   type UpdateCustomerPayload,
@@ -39,12 +44,12 @@ interface CustomerRow {
 const toIso = (value: Date | string): string =>
   (value instanceof Date ? value : new Date(value)).toISOString();
 
-// Map a row plus its loaded addresses to the canonical record. Payment methods
-// stay empty until their own endpoints exist; optional fields are omitted when
-// null so the JSON stays clean.
+// Map a row plus its loaded sub-aggregates to the canonical record. Optional
+// fields are omitted when null so the JSON stays clean.
 const toCustomer = (
   row: CustomerRow,
   addresses: ReadonlyArray<Address>,
+  paymentMethods: ReadonlyArray<PaymentMethod>,
 ): Customer => ({
   id: row.id as CustomerId,
   email: row.email,
@@ -65,7 +70,7 @@ const toCustomer = (
   ...(row.default_address_id !== null
     ? { defaultAddressId: row.default_address_id as AddressId }
     : {}),
-  paymentMethods: [],
+  paymentMethods,
   ...(row.default_payment_method_id !== null
     ? { defaultPaymentMethodId: row.default_payment_method_id as PaymentMethodId }
     : {}),
@@ -78,7 +83,7 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
     effect: Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient;
 
-      // Load a row's owned addresses and assemble the canonical record.
+      // Load a row's owned sub-aggregates and assemble the canonical record.
       const hydrate = (row: CustomerRow) =>
         Effect.gen(function* () {
           const addressRows = yield* sql<AddressRow>`
@@ -86,7 +91,16 @@ export class CustomersRepository extends Effect.Service<CustomersRepository>()(
             WHERE customer_id = ${row.id}
             ORDER BY created_at ASC
           `;
-          return toCustomer(row, addressRows.map(toAddress));
+          const paymentMethodRows = yield* sql<PaymentMethodRow>`
+            SELECT * FROM payment_methods
+            WHERE customer_id = ${row.id}
+            ORDER BY created_at ASC
+          `;
+          return toCustomer(
+            row,
+            addressRows.map(toAddress),
+            paymentMethodRows.map(toPaymentMethod),
+          );
         });
 
       const findById = (id: CustomerId) =>

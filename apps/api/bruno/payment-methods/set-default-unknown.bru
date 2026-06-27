@@ -1,0 +1,30 @@
+meta {
+  name: Set Default Unknown Payment Method
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/customers/{{pmCustomerId}}/default-payment-method
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "paymentMethodId": "pm_does-not-exist"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq PaymentMethodNotFound
+}
+
+tests {
+  test("rejects a card that isn't the customer's", function () {
+    expect(res.getStatus()).to.equal(404);
+    expect(res.getBody()._tag).to.equal("PaymentMethodNotFound");
+    expect(res.getBody().paymentMethodId).to.equal("pm_does-not-exist");
+  });
+}
