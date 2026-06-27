@@ -67,7 +67,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
     task = load_task(args.task)
     cfg = HarnessConfig.from_env()
     try:
-        report = asyncio.run(run_task(cfg, task, args.k))
+        report = asyncio.run(run_task(cfg, task, args.k, args.concurrency))
     except ConfigError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2
@@ -84,6 +84,12 @@ def main() -> int:
     run = sub.add_parser("run", help="Run a task k times and report pass^k.")
     run.add_argument("task", help="Task id (tasks/<id>.json) or a path to a task file.")
     run.add_argument("--k", type=int, default=1, help="Number of trials (default 1).")
+    run.add_argument(
+        "--concurrency",
+        type=int,
+        default=1,
+        help="Max trials to run at once (default 1 = serial).",
+    )
     run.add_argument(
         "--transcript",
         action="store_true",
