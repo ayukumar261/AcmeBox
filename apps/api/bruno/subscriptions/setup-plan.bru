@@ -1,0 +1,40 @@
+meta {
+  name: Setup Plan
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/plans
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "2 recipes · 4 servings",
+    "mealsPerWeek": 2,
+    "servingsPerMeal": 4,
+    "currency": "USD",
+    "country": "US",
+    "pricePerServing": 999,
+    "shippingFee": 599
+  }
+}
+
+script:post-response {
+  bru.setVar("subPlanId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.active: eq true
+}
+
+tests {
+  test("creates an active fixture plan", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^plan_/);
+    expect(res.getBody().active).to.equal(true);
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Invalid Transition
+  type: http
+  seq: 20
+}
+
+patch {
+  url: {{baseUrl}}/subscriptions/{{subscriptionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "active"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq InvalidSubscriptionTransition
+}
+
+tests {
+  test("responds with 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("refuses to reactivate a canceled subscription", function () {
+    // canceled is terminal — there is no path back out of it.
+    expect(res.getBody()._tag).to.equal("InvalidSubscriptionTransition");
+    expect(res.getBody().from).to.equal("canceled");
+    expect(res.getBody().to).to.equal("active");
+  });
+}

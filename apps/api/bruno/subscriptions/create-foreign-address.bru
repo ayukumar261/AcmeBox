@@ -1,0 +1,40 @@
+meta {
+  name: Create Foreign Address
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/subscriptions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerId": "{{subCustomerIdB}}",
+    "planId": "{{subPlanId}}",
+    "deliveryDay": "monday",
+    "deliveryAddressId": "{{subAddressId}}",
+    "paymentMethodId": "{{subPaymentMethodId}}",
+    "nextDeliveryDate": "2026-07-08T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq AddressNotFound
+}
+
+tests {
+  test("responds with 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("rejects an address that belongs to another customer", function () {
+    // subAddressId belongs to customer A, not customer B.
+    expect(res.getBody()._tag).to.equal("AddressNotFound");
+    expect(res.getBody().customerId).to.equal(bru.getVar("subCustomerIdB"));
+    expect(res.getBody().addressId).to.equal(bru.getVar("subAddressId"));
+  });
+}

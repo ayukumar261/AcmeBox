@@ -1,0 +1,29 @@
+meta {
+  name: Customer Points At Subscription
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/customers/{{subCustomerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.subscriptionId: eq {{subscriptionId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("the customer now points at its current subscription", function () {
+    // customers.subscription_id was wired up by the subscription create.
+    expect(res.getBody().subscriptionId).to.equal(
+      bru.getVar("subscriptionId"),
+    );
+  });
+}

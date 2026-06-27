@@ -1,0 +1,51 @@
+meta {
+  name: Create Subscription
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/subscriptions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerId": "{{subCustomerId}}",
+    "planId": "{{subPlanId}}",
+    "deliveryDay": "wednesday",
+    "deliveryAddressId": "{{subAddressId}}",
+    "paymentMethodId": "{{subPaymentMethodId}}",
+    "nextDeliveryDate": "2026-07-08T00:00:00Z"
+  }
+}
+
+script:post-response {
+  bru.setVar("subscriptionId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq active
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded subscription id, started active", function () {
+    expect(res.getBody().id).to.match(/^sub_/);
+    expect(res.getBody().status).to.equal("active");
+  });
+
+  test("echoes the fulfillment references", function () {
+    const body = res.getBody();
+    expect(body.customerId).to.equal(bru.getVar("subCustomerId"));
+    expect(body.planId).to.equal(bru.getVar("subPlanId"));
+    expect(body.deliveryDay).to.equal("wednesday");
+    expect(body.deliveryAddressId).to.equal(bru.getVar("subAddressId"));
+    expect(body.paymentMethodId).to.equal(bru.getVar("subPaymentMethodId"));
+  });
+}

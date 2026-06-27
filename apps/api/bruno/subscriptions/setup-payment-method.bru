@@ -1,0 +1,35 @@
+meta {
+  name: Setup Payment Method
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/customers/{{subCustomerId}}/payment-methods
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "brand": "visa",
+    "last4": "4242",
+    "expiryMonth": 12,
+    "expiryYear": 2030
+  }
+}
+
+script:post-response {
+  bru.setVar("subPaymentMethodId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the fixture payment method", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^pm_/);
+  });
+}

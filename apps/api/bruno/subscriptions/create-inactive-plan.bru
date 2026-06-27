@@ -1,0 +1,38 @@
+meta {
+  name: Create Inactive Plan
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/subscriptions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerId": "{{subCustomerIdB}}",
+    "planId": "{{subInactivePlanId}}",
+    "deliveryDay": "monday",
+    "deliveryAddressId": "{{subAddressId}}",
+    "paymentMethodId": "{{subPaymentMethodId}}",
+    "nextDeliveryDate": "2026-07-08T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 422
+  res.body._tag: eq PlanInactive
+}
+
+tests {
+  test("responds with 422", function () {
+    expect(res.getStatus()).to.equal(422);
+  });
+
+  test("refuses signups onto a retired plan", function () {
+    expect(res.getBody()._tag).to.equal("PlanInactive");
+    expect(res.getBody().planId).to.equal(bru.getVar("subInactivePlanId"));
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Get Subscription By Id
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/subscriptions/{{subscriptionId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{subscriptionId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the canonical subscription record", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("subscriptionId"));
+    expect(res.getBody().customerId).to.equal(bru.getVar("subCustomerId"));
+    expect(res.getBody().status).to.equal("active");
+  });
+}

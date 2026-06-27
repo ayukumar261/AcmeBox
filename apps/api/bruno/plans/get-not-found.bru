@@ -1,0 +1,27 @@
+meta {
+  name: Get Plan Not Found
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/plans/plan_does-not-exist
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq PlanNotFound
+}
+
+tests {
+  test("responds with 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns the PlanNotFound error", function () {
+    expect(res.getBody()._tag).to.equal("PlanNotFound");
+    expect(res.getBody().planId).to.equal("plan_does-not-exist");
+  });
+}

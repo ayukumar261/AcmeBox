@@ -1,0 +1,27 @@
+meta {
+  name: Customer Pointer Cleared
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/customers/{{subCustomerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("canceling clears the customer's subscription pointer", function () {
+    // The pointer is dropped (optional field omitted) so the customer is free
+    // to resubscribe.
+    expect(res.getBody().subscriptionId).to.equal(undefined);
+  });
+}

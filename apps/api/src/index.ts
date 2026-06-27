@@ -13,6 +13,10 @@ import { CustomersLive } from "./customers/handlers.js";
 import { CustomersRepository } from "./customers/repository.js";
 import { PaymentMethodsLive } from "./payment-methods/handlers.js";
 import { PaymentMethodsRepository } from "./payment-methods/repository.js";
+import { PlansLive } from "./plans/handlers.js";
+import { PlansRepository } from "./plans/repository.js";
+import { SubscriptionsLive } from "./subscriptions/handlers.js";
+import { SubscriptionsRepository } from "./subscriptions/repository.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
@@ -29,9 +33,13 @@ const ApiLive = HttpApiBuilder.api(Api).pipe(
   Layer.provide(CustomersLive),
   Layer.provide(AddressesLive),
   Layer.provide(PaymentMethodsLive),
+  Layer.provide(PlansLive),
+  Layer.provide(SubscriptionsLive),
   Layer.provide(CustomersRepository.Default),
   Layer.provide(AddressesRepository.Default),
   Layer.provide(PaymentMethodsRepository.Default),
+  Layer.provide(PlansRepository.Default),
+  Layer.provide(SubscriptionsRepository.Default),
 );
 
 // --- Server ------------------------------------------------------------------

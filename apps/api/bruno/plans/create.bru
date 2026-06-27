@@ -1,0 +1,51 @@
+meta {
+  name: Create Plan
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/plans
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "4 recipes · 2 servings",
+    "mealsPerWeek": 4,
+    "servingsPerMeal": 2,
+    "currency": "USD",
+    "country": "US",
+    "pricePerServing": 1099,
+    "shippingFee": 0
+  }
+}
+
+script:post-response {
+  bru.setVar("planId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.active: eq true
+  res.body.currency: eq USD
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded plan id", function () {
+    expect(res.getBody().id).to.match(/^plan_/);
+  });
+
+  test("new plans default to active and echo the config", function () {
+    expect(res.getBody().active).to.equal(true);
+    expect(res.getBody().mealsPerWeek).to.equal(4);
+    expect(res.getBody().servingsPerMeal).to.equal(2);
+    expect(res.getBody().pricePerServing).to.equal(1099);
+    expect(res.getBody().shippingFee).to.equal(0);
+  });
+}

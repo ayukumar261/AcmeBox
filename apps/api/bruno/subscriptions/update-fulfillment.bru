@@ -1,0 +1,42 @@
+meta {
+  name: Update Fulfillment
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseUrl}}/subscriptions/{{subscriptionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "deliveryDay": "friday",
+    "nextDeliveryDate": "2026-07-10T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.deliveryDay: eq friday
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("reschedules without touching status", function () {
+    expect(res.getBody().deliveryDay).to.equal("friday");
+    expect(res.getBody().nextDeliveryDate).to.equal("2026-07-10T00:00:00.000Z");
+    expect(res.getBody().status).to.equal("active");
+  });
+
+  test("leaves untouched references alone", function () {
+    expect(res.getBody().planId).to.equal(bru.getVar("subPlanId"));
+    expect(res.getBody().deliveryAddressId).to.equal(
+      bru.getVar("subAddressId"),
+    );
+  });
+}

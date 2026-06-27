@@ -1,0 +1,32 @@
+meta {
+  name: List Subscriptions By Customer
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/subscriptions?customerId={{subCustomerId}}
+  body: none
+  auth: none
+}
+
+params:query {
+  customerId: {{subCustomerId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the customer's subscription", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array").with.lengthOf(1);
+    expect(body[0].id).to.equal(bru.getVar("subscriptionId"));
+    expect(body[0].customerId).to.equal(bru.getVar("subCustomerId"));
+  });
+}

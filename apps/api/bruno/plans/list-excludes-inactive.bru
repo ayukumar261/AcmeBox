@@ -1,0 +1,30 @@
+meta {
+  name: List Excludes Inactive
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/plans?active=true
+  body: none
+  auth: none
+}
+
+params:query {
+  active: true
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("the retired plan is absent from the active catalog", function () {
+    const ids = res.getBody().map((p) => p.id);
+    expect(ids).to.not.include(bru.getVar("planId"));
+  });
+}

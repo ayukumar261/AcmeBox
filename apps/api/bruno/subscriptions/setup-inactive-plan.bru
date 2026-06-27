@@ -1,0 +1,40 @@
+meta {
+  name: Setup Inactive Plan
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/plans
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Retired · 3 recipes · 2 servings",
+    "mealsPerWeek": 3,
+    "servingsPerMeal": 2,
+    "currency": "USD",
+    "country": "US",
+    "pricePerServing": 1199,
+    "shippingFee": 0,
+    "active": false
+  }
+}
+
+script:post-response {
+  bru.setVar("subInactivePlanId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.active: eq false
+}
+
+tests {
+  test("creates a retired fixture plan", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().active).to.equal(false);
+  });
+}

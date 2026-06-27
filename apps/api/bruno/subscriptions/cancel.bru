@@ -1,0 +1,32 @@
+meta {
+  name: Cancel Subscription
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/subscriptions/{{subscriptionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "canceled"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq canceled
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("moves the subscription to canceled", function () {
+    expect(res.getBody().status).to.equal("canceled");
+  });
+}

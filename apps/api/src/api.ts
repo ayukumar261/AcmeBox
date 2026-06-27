@@ -3,6 +3,8 @@ import { Schema } from "effect";
 import { AddressesGroup } from "./addresses/group.js";
 import { CustomersGroup } from "./customers/group.js";
 import { PaymentMethodsGroup } from "./payment-methods/group.js";
+import { PlansGroup } from "./plans/group.js";
+import { SubscriptionsGroup } from "./subscriptions/group.js";
 
 // --- Schemas -----------------------------------------------------------------
 
@@ -23,4 +25,6 @@ export const Api = HttpApi.make("AcmeBoxApi")
   .add(HealthGroup)
   .add(CustomersGroup)
   .add(AddressesGroup)
-  .add(PaymentMethodsGroup);
+  .add(PaymentMethodsGroup)
+  .add(PlansGroup)
+  .add(SubscriptionsGroup);

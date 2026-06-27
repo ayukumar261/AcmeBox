@@ -1,0 +1,28 @@
+meta {
+  name: Get Plan By Id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/plans/{{planId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{planId}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the canonical plan record", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("planId"));
+    expect(res.getBody().name).to.equal("4 recipes · 2 servings");
+    expect(res.getBody().country).to.equal("US");
+  });
+}

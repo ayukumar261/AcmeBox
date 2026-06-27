@@ -1,0 +1,38 @@
+meta {
+  name: Retire Plan
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/plans/{{planId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "active": false
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.active: eq false
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("flips the plan to retired", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("planId"));
+    expect(res.getBody().active).to.equal(false);
+  });
+
+  test("leaves immutable config untouched", function () {
+    expect(res.getBody().pricePerServing).to.equal(1099);
+    expect(res.getBody().mealsPerWeek).to.equal(4);
+  });
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Pause Subscription
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/subscriptions/{{subscriptionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "paused"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq paused
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("moves the subscription to paused", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("subscriptionId"));
+    expect(res.getBody().status).to.equal("paused");
+  });
+}

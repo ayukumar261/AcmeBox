@@ -1,0 +1,31 @@
+meta {
+  name: List Includes Inactive
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/plans?active=false
+  body: none
+  auth: none
+}
+
+params:query {
+  active: false
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("the retired plan shows up when filtering active=false", function () {
+    const match = res.getBody().find((p) => p.id === bru.getVar("planId"));
+    expect(match, "retired plan present").to.not.equal(undefined);
+    expect(match.active).to.equal(false);
+  });
+}

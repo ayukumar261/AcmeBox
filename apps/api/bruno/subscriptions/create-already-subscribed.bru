@@ -1,0 +1,41 @@
+meta {
+  name: Create Already Subscribed
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/subscriptions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerId": "{{subCustomerId}}",
+    "planId": "{{subPlanId}}",
+    "deliveryDay": "friday",
+    "deliveryAddressId": "{{subAddressId}}",
+    "paymentMethodId": "{{subPaymentMethodId}}",
+    "nextDeliveryDate": "2026-07-15T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq CustomerAlreadySubscribed
+}
+
+tests {
+  test("responds with 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("names the existing live subscription", function () {
+    expect(res.getBody()._tag).to.equal("CustomerAlreadySubscribed");
+    expect(res.getBody().customerId).to.equal(bru.getVar("subCustomerId"));
+    expect(res.getBody().subscriptionId).to.equal(
+      bru.getVar("subscriptionId"),
+    );
+  });
+}

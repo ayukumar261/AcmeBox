@@ -1,0 +1,35 @@
+meta {
+  name: List Plans
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/plans?active=true&country=US
+  body: none
+  auth: none
+}
+
+params:query {
+  active: true
+  country: US
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("active US plans include the one we created", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array");
+    const ids = body.map((p) => p.id);
+    expect(ids).to.include(bru.getVar("planId"));
+    expect(body.every((p) => p.active === true)).to.equal(true);
+    expect(body.every((p) => p.country === "US")).to.equal(true);
+  });
+}

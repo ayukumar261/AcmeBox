@@ -1,0 +1,43 @@
+meta {
+  name: Setup Customer B
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{subEmailB}}",
+    "firstName": "Sally",
+    "lastName": "Ride",
+    "locale": "en-US",
+    "timezone": "America/Los_Angeles",
+    "country": "US"
+  }
+}
+
+script:pre-request {
+  // A second, unsubscribed customer used to exercise create-time validation
+  // that fires before the already-subscribed guard would on customer A.
+  bru.setVar("subEmailB", `sub-b-${Date.now()}@example.com`);
+}
+
+script:post-response {
+  bru.setVar("subCustomerIdB", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the second fixture customer", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^cus_/);
+  });
+}
