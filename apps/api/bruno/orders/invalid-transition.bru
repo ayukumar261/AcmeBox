@@ -1,0 +1,35 @@
+meta {
+  name: Invalid Transition
+  type: http
+  seq: 16
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "shipped"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq InvalidOrderTransition
+}
+
+tests {
+  test("responds with 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("refuses to move out of the terminal delivered state", function () {
+    const body = res.getBody();
+    expect(body._tag).to.equal("InvalidOrderTransition");
+    expect(body.from).to.equal("delivered");
+    expect(body.to).to.equal("shipped");
+  });
+}

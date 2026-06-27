@@ -1,0 +1,34 @@
+meta {
+  name: Ship Order
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "shipped",
+    "carrier": "ups",
+    "trackingNumber": "1Z999AA10123456784"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq shipped
+}
+
+tests {
+  test("responds with 200 and records the shipment", function () {
+    const body = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(body.status).to.equal("shipped");
+    expect(body.carrier).to.equal("ups");
+    expect(body.trackingNumber).to.equal("1Z999AA10123456784");
+  });
+}

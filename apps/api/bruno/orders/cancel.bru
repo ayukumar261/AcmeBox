@@ -1,0 +1,29 @@
+meta {
+  name: Cancel Order
+  type: http
+  seq: 19
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId2}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "canceled"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq canceled
+}
+
+tests {
+  test("responds with 200 and cancels a still-pending order", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().status).to.equal("canceled");
+  });
+}

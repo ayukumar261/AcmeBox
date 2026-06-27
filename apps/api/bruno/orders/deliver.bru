@@ -1,0 +1,29 @@
+meta {
+  name: Deliver Order
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "delivered"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq delivered
+}
+
+tests {
+  test("responds with 200 and marks the box delivered", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().status).to.equal("delivered");
+  });
+}

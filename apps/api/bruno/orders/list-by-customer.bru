@@ -1,0 +1,25 @@
+meta {
+  name: List Orders By Customer
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/orders?customerId={{ordCustomerId}}
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the customer's order", function () {
+    const ids = res.getBody().map((o) => o.id);
+    expect(ids).to.include(bru.getVar("orderId"));
+  });
+}

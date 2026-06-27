@@ -1,0 +1,31 @@
+meta {
+  name: Update Fulfillment While Pending
+  type: http
+  seq: 12
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "addressId": "{{ordAddressId}}",
+    "deliveryDate": "2026-07-23T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq pending
+}
+
+tests {
+  test("responds with 200 and reschedules a pending order", function () {
+    expect(res.getStatus()).to.equal(200);
+    // Fulfillment is editable while the box hasn't shipped.
+    expect(res.getBody().deliveryDate).to.equal("2026-07-23T00:00:00.000Z");
+  });
+}

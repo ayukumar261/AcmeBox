@@ -1,0 +1,41 @@
+meta {
+  name: Setup Meal A
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Miso-Glazed Salmon",
+    "steps": [
+      "Whisk miso, mirin, and soy.",
+      "Glaze the salmon and broil 8 minutes."
+    ],
+    "ingredients": [
+      "2 salmon fillets",
+      "2 tbsp white miso",
+      "1 tbsp mirin"
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("ordMealAId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates fixture meal A", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^meal_/);
+  });
+}

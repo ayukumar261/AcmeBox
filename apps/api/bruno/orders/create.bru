@@ -1,0 +1,61 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "subscriptionId": "{{ordSubscriptionId}}",
+    "addressId": "{{ordAddressId}}",
+    "paymentMethodId": "{{ordPaymentMethodId}}",
+    "deliveryDate": "2026-07-16T00:00:00Z",
+    "price": 3996,
+    "currency": "USD",
+    "items": [
+      { "mealId": "{{ordMealAId}}", "quantity": 1 },
+      { "mealId": "{{ordMealBId}}", "quantity": 1 }
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("orderId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq pending
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded order id, started pending with no shipment", function () {
+    const body = res.getBody();
+    expect(body.id).to.match(/^ord_/);
+    expect(body.status).to.equal("pending");
+    expect(body.carrier).to.equal(undefined);
+    expect(body.trackingNumber).to.equal(undefined);
+  });
+
+  test("derives the customer and round-trips the price snapshot + items", function () {
+    const body = res.getBody();
+    expect(body.subscriptionId).to.equal(bru.getVar("ordSubscriptionId"));
+    expect(body.customerId).to.equal(bru.getVar("ordCustomerId"));
+    expect(body.price).to.equal(3996);
+    expect(body.currency).to.equal("USD");
+    expect(body.items).to.eql([
+      { mealId: bru.getVar("ordMealAId"), quantity: 1 },
+      { mealId: bru.getVar("ordMealBId"), quantity: 1 },
+    ]);
+  });
+}

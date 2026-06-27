@@ -1,0 +1,36 @@
+meta {
+  name: Setup Address
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/customers/{{ordCustomerId}}/addresses
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "line1": "2025 N Aviation Blvd",
+    "city": "El Segundo",
+    "region": "CA",
+    "postalCode": "90245",
+    "country": "US"
+  }
+}
+
+script:post-response {
+  bru.setVar("ordAddressId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the fixture address", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^adr_/);
+  });
+}

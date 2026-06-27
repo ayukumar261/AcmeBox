@@ -1,0 +1,26 @@
+meta {
+  name: Get Order Not Found
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/orders/ord_does-not-exist
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq OrderNotFound
+}
+
+tests {
+  test("responds with 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("reports the missing order", function () {
+    expect(res.getBody()._tag).to.equal("OrderNotFound");
+    expect(res.getBody().orderId).to.equal("ord_does-not-exist");
+  });
+}

@@ -1,0 +1,41 @@
+meta {
+  name: Setup Meal B
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Coconut Chickpea Curry",
+    "steps": [
+      "Saute onion, garlic, and ginger.",
+      "Add chickpeas and coconut milk; simmer 15 minutes."
+    ],
+    "ingredients": [
+      "1 can chickpeas",
+      "1 can coconut milk",
+      "2 tbsp curry paste"
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("ordMealBId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates fixture meal B", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^meal_/);
+  });
+}

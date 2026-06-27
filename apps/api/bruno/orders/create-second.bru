@@ -1,0 +1,44 @@
+meta {
+  name: Create Second Order
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "subscriptionId": "{{ordSubscriptionId}}",
+    "addressId": "{{ordAddressId}}",
+    "paymentMethodId": "{{ordPaymentMethodId}}",
+    "deliveryDate": "2026-07-23T00:00:00Z",
+    "price": 3996,
+    "currency": "USD",
+    "items": [
+      { "mealId": "{{ordMealAId}}", "quantity": 2 }
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("orderId2", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq pending
+}
+
+tests {
+  test("creates a second pending order (a single meal x2 also matches the plan)", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().status).to.equal("pending");
+    expect(res.getBody().items).to.eql([
+      { mealId: bru.getVar("ordMealAId"), quantity: 2 },
+    ]);
+  });
+}

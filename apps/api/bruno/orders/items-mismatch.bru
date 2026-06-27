@@ -1,0 +1,43 @@
+meta {
+  name: Create Order Items Mismatch
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "subscriptionId": "{{ordSubscriptionId}}",
+    "addressId": "{{ordAddressId}}",
+    "paymentMethodId": "{{ordPaymentMethodId}}",
+    "deliveryDate": "2026-07-16T00:00:00Z",
+    "price": 3996,
+    "currency": "USD",
+    "items": [
+      { "mealId": "{{ordMealAId}}", "quantity": 3 }
+    ]
+  }
+}
+
+assert {
+  res.status: eq 422
+  res.body._tag: eq OrderItemsMismatch
+}
+
+tests {
+  test("responds with 422", function () {
+    expect(res.getStatus()).to.equal(422);
+  });
+
+  test("total quantity must match the plan's mealsPerWeek", function () {
+    const body = res.getBody();
+    expect(body._tag).to.equal("OrderItemsMismatch");
+    expect(body.expected).to.equal(2);
+    expect(body.actual).to.equal(3);
+  });
+}

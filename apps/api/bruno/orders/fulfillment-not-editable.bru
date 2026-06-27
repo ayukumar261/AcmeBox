@@ -1,0 +1,35 @@
+meta {
+  name: Fulfillment Not Editable After Ship
+  type: http
+  seq: 14
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "deliveryDate": "2026-08-01T00:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq FulfillmentNotEditable
+}
+
+tests {
+  test("responds with 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("refuses to reschedule a shipped box", function () {
+    // The destination is locked in once the box leaves the warehouse.
+    const body = res.getBody();
+    expect(body._tag).to.equal("FulfillmentNotEditable");
+    expect(body.status).to.equal("shipped");
+  });
+}

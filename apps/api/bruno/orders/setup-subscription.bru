@@ -1,0 +1,38 @@
+meta {
+  name: Setup Subscription
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/subscriptions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerId": "{{ordCustomerId}}",
+    "planId": "{{ordPlanId}}",
+    "deliveryDay": "thursday",
+    "deliveryAddressId": "{{ordAddressId}}",
+    "paymentMethodId": "{{ordPaymentMethodId}}",
+    "nextDeliveryDate": "2026-07-16T00:00:00Z"
+  }
+}
+
+script:post-response {
+  bru.setVar("ordSubscriptionId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq active
+}
+
+tests {
+  test("creates the fixture subscription", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^sub_/);
+  });
+}

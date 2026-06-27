@@ -1,0 +1,33 @@
+meta {
+  name: Ship Without Shipment Details
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/orders/{{orderId2}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "shipped"
+  }
+}
+
+assert {
+  res.status: eq 422
+  res.body._tag: eq ShipmentDetailsRequired
+}
+
+tests {
+  test("responds with 422", function () {
+    expect(res.getStatus()).to.equal(422);
+  });
+
+  test("a box can't ship without a carrier and tracking number", function () {
+    expect(res.getBody()._tag).to.equal("ShipmentDetailsRequired");
+    expect(res.getBody().orderId).to.equal(bru.getVar("orderId2"));
+  });
+}
