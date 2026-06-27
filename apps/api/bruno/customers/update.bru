@@ -1,0 +1,41 @@
+meta {
+  name: Update Customer
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/customers/{{customerId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Augusta",
+    "timezone": "Europe/London"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.firstName: eq Augusta
+  res.body.timezone: eq Europe/London
+  res.body.lastName: eq Lovelace
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("applies the patched fields", function () {
+    expect(res.getBody().firstName).to.equal("Augusta");
+    expect(res.getBody().timezone).to.equal("Europe/London");
+  });
+
+  test("leaves untouched fields alone", function () {
+    expect(res.getBody().lastName).to.equal("Lovelace");
+    expect(res.getBody().email).to.equal(bru.getVar("email"));
+  });
+}

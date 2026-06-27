@@ -1,0 +1,27 @@
+meta {
+  name: Get Customer Not Found
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/customers/cus_does-not-exist
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq CustomerNotFound
+}
+
+tests {
+  test("responds with 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns the CustomerNotFound error", function () {
+    expect(res.getBody()._tag).to.equal("CustomerNotFound");
+    expect(res.getBody().customerId).to.equal("cus_does-not-exist");
+  });
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Get Customer By Id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/customers/{{customerId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{customerId}}
+  res.body.email: eq {{email}}
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("content-type is JSON", function () {
+    expect(res.getHeader("content-type")).to.include("application/json");
+  });
+
+  test("returns the customer we just created", function () {
+    expect(res.getBody().id).to.equal(bru.getVar("customerId"));
+    expect(res.getBody().email).to.equal(bru.getVar("email"));
+    expect(res.getBody().firstName).to.equal("Ada");
+  });
+}

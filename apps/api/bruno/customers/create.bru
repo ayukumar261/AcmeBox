@@ -1,0 +1,70 @@
+meta {
+  name: Create Customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "firstName": "Ada",
+    "lastName": "Lovelace",
+    "phone": "+12025550143",
+    "locale": "en-US",
+    "timezone": "America/New_York",
+    "country": "US"
+  }
+}
+
+script:pre-request {
+  // Unique email per run so the suite is re-runnable without 409s. Avoid a "+"
+  // here: it decodes to a space in the query string used by list-by-email.
+  bru.setVar("email", `bot-${Date.now()}@example.com`);
+}
+
+script:post-response {
+  // Hand the generated id to the later requests in this folder.
+  bru.setVar("customerId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.firstName: eq Ada
+  res.body.lastName: eq Lovelace
+  res.body.emailVerified: eq false
+  res.body.phoneVerified: eq false
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded customer id", function () {
+    expect(res.getBody().id).to.be.a("string");
+    expect(res.getBody().id).to.match(/^cus_/);
+  });
+
+  test("echoes the submitted email", function () {
+    expect(res.getBody().email).to.equal(bru.getVar("email"));
+  });
+
+  test("starts unverified with empty relationships", function () {
+    const b = res.getBody();
+    expect(b.emailVerified).to.equal(false);
+    expect(b.phoneVerified).to.equal(false);
+    expect(b.addresses).to.be.an("array").that.is.empty;
+    expect(b.paymentMethods).to.be.an("array").that.is.empty;
+  });
+
+  test("has created/updated timestamps", function () {
+    expect(res.getBody().createdAt).to.be.a("string");
+    expect(res.getBody().updatedAt).to.be.a("string");
+  });
+}

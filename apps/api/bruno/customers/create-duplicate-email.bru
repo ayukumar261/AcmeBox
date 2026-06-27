@@ -1,0 +1,38 @@
+meta {
+  name: Create Customer Duplicate Email
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "firstName": "Charles",
+    "lastName": "Babbage",
+    "locale": "en-GB",
+    "timezone": "Europe/London",
+    "country": "GB"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq EmailAlreadyExists
+}
+
+tests {
+  test("rejects a duplicate email with 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("returns the EmailAlreadyExists error", function () {
+    expect(res.getBody()._tag).to.equal("EmailAlreadyExists");
+    expect(res.getBody().email).to.equal(bru.getVar("email"));
+  });
+}

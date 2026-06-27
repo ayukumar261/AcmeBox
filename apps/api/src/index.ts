@@ -1,31 +1,16 @@
 import {
-  HttpApi,
   HttpApiBuilder,
-  HttpApiEndpoint,
-  HttpApiGroup,
   HttpApiSwagger,
   HttpMiddleware,
 } from "@effect/platform";
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer } from "effect";
 import { createServer } from "node:http";
+import { Api } from "./api.js";
+import { CustomersLive } from "./customers/handlers.js";
+import { CustomersRepository } from "./customers/repository.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
-
-// --- Schemas -----------------------------------------------------------------
-
-const HealthResponse = Schema.Struct({
-  status: Schema.Literal("ok"),
-  uptime: Schema.Number,
-});
-
-// --- API definition ----------------------------------------------------------
-
-const HealthGroup = HttpApiGroup.make("health").add(
-  HttpApiEndpoint.get("check", "/health").addSuccess(HealthResponse),
-);
-
-const Api = HttpApi.make("AcmeBoxApi").add(HealthGroup);
 
 // --- Handlers ----------------------------------------------------------------
 
@@ -35,7 +20,11 @@ const HealthLive = HttpApiBuilder.group(Api, "health", (handlers) =>
   ),
 );
 
-const ApiLive = HttpApiBuilder.api(Api).pipe(Layer.provide(HealthLive));
+const ApiLive = HttpApiBuilder.api(Api).pipe(
+  Layer.provide(HealthLive),
+  Layer.provide(CustomersLive),
+  Layer.provide(CustomersRepository.Default),
+);
 
 // --- Server ------------------------------------------------------------------
 
