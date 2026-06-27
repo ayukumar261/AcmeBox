@@ -1,0 +1,60 @@
+{
+  "id": "update_default_address",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_old",
+        "customer_id": "cust_1",
+        "line1": "1 Old St",
+        "city": "Boston",
+        "region": "MA",
+        "postal_code": "02101",
+        "country": "US"
+      },
+      {
+        "id": "addr_new",
+        "customer_id": "cust_1",
+        "line1": "500 New Ave",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an AcmeBox customer (your customer id is cust_1). You recently added your new Austin address (500 New Ave, Austin, TX) to your profile. You want that Austin address to be your DEFAULT shipping address from now on. You do NOT want to change anything else about your account. Once the agent confirms the default has been updated, you are done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_address_id": "addr_new" }
+      }
+    ],
+    "actions": [
+      {
+        "tool": "addresses_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "addressId": "addr_new" }
+        }
+      }
+    ]
+  }
+}
