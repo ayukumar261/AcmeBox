@@ -33,7 +33,7 @@ export type ServingsPerMeal = typeof ServingsPerMeal.Type;
 
 /**
  * Money in minor units (cents) as an integer — never a float. Box total =
- * pricePerServing × mealsPerWeek × servingsPerMeal + shippingFee stays exact.
+ * pricePerServing × mealsPerWeek × servingsPerMeal stays exact.
  */
 const Money = Schema.Number;
 
@@ -52,7 +52,6 @@ export const Plan = Schema.Struct({
   currency: Currency,
   country: CountryCode,
   pricePerServing: Money,
-  shippingFee: Money,
 
   active: Schema.Boolean,
 
@@ -72,7 +71,6 @@ export const CreatePlanPayload = Schema.Struct({
   currency: Currency,
   country: CountryCode,
   pricePerServing: MoneyInput,
-  shippingFee: MoneyInput,
   active: Schema.optional(Schema.Boolean),
 });
 export type CreatePlanPayload = typeof CreatePlanPayload.Type;

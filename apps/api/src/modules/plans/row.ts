@@ -15,7 +15,6 @@ export interface PlanRow {
   readonly currency: string;
   readonly country: string;
   readonly price_per_serving: number;
-  readonly shipping_fee: number;
   readonly active: boolean;
   readonly created_at: Date | string;
   readonly updated_at: Date | string;
@@ -34,7 +33,6 @@ export const toPlan = (row: PlanRow): Plan => ({
   currency: row.currency as Currency,
   country: row.country,
   pricePerServing: row.price_per_serving,
-  shippingFee: row.shipping_fee,
   active: row.active,
   updatedAt: toIso(row.updated_at),
   createdAt: toIso(row.created_at),

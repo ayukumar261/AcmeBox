@@ -60,11 +60,11 @@ export class PlansRepository extends Effect.Service<PlansRepository>()(
           yield* sql`
             INSERT INTO plans
               (id, name, meals_per_week, servings_per_meal, currency, country,
-               price_per_serving, shipping_fee, active)
+               price_per_serving, active)
             VALUES (
               ${id}, ${payload.name}, ${payload.mealsPerWeek},
               ${payload.servingsPerMeal}, ${payload.currency}, ${payload.country},
-              ${payload.pricePerServing}, ${payload.shippingFee},
+              ${payload.pricePerServing},
               ${payload.active ?? true}
             )
           `;
