@@ -20,6 +20,8 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from openai import APIError, OpenAI
@@ -128,6 +130,18 @@ _USER_SYSTEM_SUFFIX = (
     f"exactly {STOP_TOKEN} and nothing else."
 )
 
+# The shared, domain-wide policy every agent must follow. Lives in its own file
+# so the rulebook under test is canonical across all tasks rather than copied
+# into each one; per-task ``policy`` text is layered on top for scenario-specific
+# overrides.
+_POLICY_PATH = Path(__file__).resolve().parent / "policy.md"
+
+
+@lru_cache(maxsize=1)
+def _shared_policy() -> str:
+    return _POLICY_PATH.read_text().strip()
+
+
 # Safety bound so a misbehaving agent can't loop forever inside a single turn.
 _MAX_TOOL_ITERS = 10
 
@@ -141,9 +155,10 @@ class Conversation:
 
 
 def _agent_system_prompt(task: Task) -> str:
+    parts = [_AGENT_SYSTEM, f"Policy:\n{_shared_policy()}"]
     if task.policy:
-        return f"{_AGENT_SYSTEM}\n\nPolicy:\n{task.policy}"
-    return _AGENT_SYSTEM
+        parts.append(f"Additional policy for this scenario:\n{task.policy}")
+    return "\n\n".join(parts)
 
 
 def _user_system_prompt(task: Task) -> str:

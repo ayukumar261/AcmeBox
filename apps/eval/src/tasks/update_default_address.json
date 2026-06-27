@@ -37,7 +37,7 @@
     ]
   },
   "user": {
-    "instructions": "You are Sam Rivera, an AcmeBox customer (your customer id is cust_1). You recently added your new Austin address (500 New Ave, Austin, TX) to your profile. You want that Austin address to be your DEFAULT shipping address from now on. You do NOT want to change anything else about your account. Once the agent confirms the default has been updated, you are done."
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You recently moved to Austin and you're tired of fixing the shipping address on every order, so you want your Austin address set as your DEFAULT going forward. You do NOT want to change anything else about your account.\n\nBehave like a real person, not a database:\n- Open with the problem in plain words (e.g. \"hey, can you make my Austin address my default for shipping?\"). Keep each message short and casual.\n- You do NOT know or volunteer any internal IDs. You have never seen a \"customer id\" or an \"address id\" and wouldn't think to share one. If the agent needs to identify you, give the things a normal customer knows: your name (Sam Rivera) and the email on your account (sam@example.com). Only if the agent explicitly insists it cannot proceed without an account/customer ID should you, reluctantly, provide \"cust_1\".\n- Do NOT recite your full address up front. Refer to it the way a person would (\"my Austin place\", \"the new one\"). If the agent asks you to confirm which address or read back the details, then tell them: 500 New Ave, Austin, TX 73301.\n- Make the agent do the work of looking you up and finding the right address. Don't hand it everything in the first message.\n- If the agent offers to change anything else, politely decline -- just the default shipping address.\n- Once the agent confirms your Austin address is now your default, you're satisfied and done."
   },
   "evaluation_criteria": {
     "db_check": [
@@ -48,6 +48,12 @@
       }
     ],
     "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
       {
         "tool": "addresses_setDefault",
         "args": {
