@@ -7,7 +7,7 @@ by token and keeps the conversation history in memory.
 Usage:
     python3 chat.py                         # talk to the default endpoint
     BASE_URL=http://localhost:8000/v1 python3 chat.py
-    MODEL=LiquidAI/LFM2.5-1.2B-Instruct python3 chat.py
+    MODEL=LiquidAI/LFM2.5-8B-A1B python3 chat.py
 
 In the chat:
     /reset   start a new conversation
@@ -20,7 +20,7 @@ import sys
 import urllib.request
 
 BASE_URL = os.getenv("BASE_URL", "https://1tbj4yr4jpvib2-8000.proxy.runpod.net/v1").rstrip("/")
-MODEL = os.getenv("MODEL", "LiquidAI/LFM2.5-1.2B-Instruct")
+MODEL = os.getenv("MODEL", "LiquidAI/LFM2.5-8B-A1B")
 API_KEY = os.getenv("API_KEY", "EMPTY")
 SYSTEM = os.getenv("SYSTEM_PROMPT", "You are a helpful, concise assistant.")
 

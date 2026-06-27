@@ -10,8 +10,9 @@ echo "[setup] nvidia:"; nvidia-smi --query-gpu=name,memory.total --format=csv,no
 
 pip install --upgrade pip
 
-# vLLM pulls a matching torch CUDA build as a dependency. v0.23+ has the LFM2.5
-# dense architecture and the native `lfm2` tool-call parser.
+# vLLM pulls a matching torch CUDA build as a dependency. v0.23+ registers both
+# the dense LFM2.5 (`Lfm2ForCausalLM`) and the MoE (`Lfm2MoeForCausalLM`, what
+# LFM2.5-8B-A1B uses) architectures, plus the native `lfm2` tool-call parser.
 pip install "vllm>=0.23"
 
 # LFM2.5 is open-license (not gated), so no HF login is required. Set HF_TOKEN
