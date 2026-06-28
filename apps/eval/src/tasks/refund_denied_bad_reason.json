@@ -1,0 +1,127 @@
+{
+  "id": "refund_denied_bad_reason",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "jordan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Jordan",
+        "last_name": "Lee",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "88 Oak Street",
+        "city": "Brooklyn",
+        "region": "NY",
+        "postal_code": "11201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 6,
+        "expiry_year": 2028,
+        "created_at": "2025-03-10T08:00:00Z"
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Person Plan",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true,
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "thursday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-10T00:00:00Z",
+        "created_at": "2025-03-15T00:00:00Z",
+        "updated_at": "2025-03-15T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-26T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "fedex",
+        "tracking_number": "9400111899223481001000",
+        "created_at": "2026-06-21T00:00:00Z",
+        "updated_at": "2026-06-26T14:00:00Z"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_def456",
+        "failure_reason": null,
+        "refund_reason": null,
+        "processed_at": "2026-06-21T10:00:00Z",
+        "refunded_at": null,
+        "created_at": "2026-06-21T10:00:00Z",
+        "updated_at": "2026-06-21T10:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Jordan Lee, an AcmeBox customer contacting support. Your last delivery arrived two days late and you missed the meals for the week because you were already at a friend's house by the time the box showed up. You want a refund because of the late delivery.\n\nBehave like a real person and follow this flow:\n- Open by explaining your last box arrived two days late and you want a refund because you couldn't use the food. Be a little frustrated.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it before they ask.\n- If the agent asks whether the food itself was spoiled or damaged when you eventually got it, be honest: the food arrived fine, just late. You never opened it.\n- If the agent refuses the refund because late delivery doesn't qualify, accept the explanation politely, perhaps expressing mild disappointment, and end the conversation. Do NOT push harder or claim the ingredients were bad — they weren't.\n- Do NOT accept a refund if the agent offers one anyway; that would be incorrect behavior."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_1",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      }
+    ]
+  }
+}

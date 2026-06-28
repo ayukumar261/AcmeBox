@@ -1,0 +1,139 @@
+{
+  "id": "refund_bad_ingredients",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "alex@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Alex",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "42 Maple Drive",
+        "city": "Portland",
+        "region": "OR",
+        "postal_code": "97201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 12,
+        "expiry_year": 2027,
+        "created_at": "2025-01-15T10:00:00Z"
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Person Plan",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true,
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "wednesday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-09T00:00:00Z",
+        "created_at": "2025-02-01T00:00:00Z",
+        "updated_at": "2025-02-01T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-25T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "ups",
+        "tracking_number": "1Z999AA10123456784",
+        "created_at": "2026-06-20T00:00:00Z",
+        "updated_at": "2026-06-25T12:00:00Z"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_abc123",
+        "failure_reason": null,
+        "refund_reason": null,
+        "processed_at": "2026-06-20T10:00:00Z",
+        "refunded_at": null,
+        "created_at": "2026-06-20T10:00:00Z",
+        "updated_at": "2026-06-20T10:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Alex Chen, an AcmeBox customer contacting support. Your most recent box (payment ID pay_1) arrived with rotten tomatoes — they were completely black and slimy and you had to throw them out. You want a refund for this delivery.\n\nBehave like a real person and follow this flow:\n- Open by saying you want to report a problem with your last delivery and request a refund. Keep it brief and casual.\n- When the agent asks for your customer ID to look up your account, provide it: cust_1. Do not volunteer it before they ask.\n- When asked what was wrong, explain that the tomatoes in the box were rotten and unusable.\n- When asked which payment or order to refund, give the payment ID: pay_1.\n- Once the agent confirms the refund has been issued, thank them and wrap up the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_1",
+        "expect": { "status": "refunded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1", "status": "refunded" }
+        }
+      },
+      {
+        "tool": "payments_refund",
+        "args": {
+          "path": { "paymentId": "pay_1" }
+        }
+      }
+    ]
+  }
+}

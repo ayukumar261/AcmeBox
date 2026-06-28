@@ -1,0 +1,103 @@
+{
+  "id": "cancel_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "casey@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Casey",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "15 River Road",
+        "city": "Minneapolis",
+        "region": "MN",
+        "postal_code": "55401",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "9999",
+        "expiry_month": 8,
+        "expiry_year": 2028,
+        "created_at": "2025-05-01T00:00:00Z"
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Person Plan",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true,
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "friday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-03T00:00:00Z",
+        "created_at": "2025-05-10T00:00:00Z",
+        "updated_at": "2025-05-10T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Casey Kim, an AcmeBox customer contacting support. You want to cancel your meal-kit subscription immediately. Your reason is personal — you're moving abroad next month and won't need it anymore — but you don't need to share this unless asked.\n\nBehave like a real person and follow this flow:\n- Open with your name and say you'd like to cancel your subscription. Keep it brief and direct.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Do not volunteer it before they ask.\n- If the agent asks why you want to cancel, give the reason: you're moving abroad.\n- If the agent asks which subscription to cancel, confirm it's your only one.\n- Once the agent confirms your subscription has been canceled, thank them and end the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "status": "canceled" }
+        }
+      }
+    ]
+  }
+}

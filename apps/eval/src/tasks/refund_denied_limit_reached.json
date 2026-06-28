@@ -1,0 +1,232 @@
+{
+  "id": "refund_denied_limit_reached",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "morgan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Morgan",
+        "last_name": "Taylor",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "300 Elm Avenue",
+        "city": "Chicago",
+        "region": "IL",
+        "postal_code": "60601",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "1234",
+        "expiry_month": 9,
+        "expiry_year": 2026,
+        "created_at": "2024-06-01T00:00:00Z"
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Person Plan",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true,
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z",
+        "created_at": "2024-06-15T00:00:00Z",
+        "updated_at": "2024-06-15T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_r1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2025-09-08T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "ups",
+        "tracking_number": "1Z111AA00000000001",
+        "created_at": "2025-09-01T00:00:00Z",
+        "updated_at": "2025-09-08T00:00:00Z"
+      },
+      {
+        "id": "ord_r2",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2025-11-10T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "ups",
+        "tracking_number": "1Z111AA00000000002",
+        "created_at": "2025-11-03T00:00:00Z",
+        "updated_at": "2025-11-10T00:00:00Z"
+      },
+      {
+        "id": "ord_r3",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-02-16T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "ups",
+        "tracking_number": "1Z111AA00000000003",
+        "created_at": "2026-02-09T00:00:00Z",
+        "updated_at": "2026-02-16T00:00:00Z"
+      },
+      {
+        "id": "ord_current",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-22T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 1}, {"mealId": "meal_2", "quantity": 1}],
+        "carrier": "ups",
+        "tracking_number": "1Z111AA00000000004",
+        "created_at": "2026-06-15T00:00:00Z",
+        "updated_at": "2026-06-22T00:00:00Z"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_r1",
+        "customer_id": "cust_1",
+        "order_id": "ord_r1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_r1",
+        "failure_reason": null,
+        "refund_reason": "moldy spinach",
+        "processed_at": "2025-09-01T10:00:00Z",
+        "refunded_at": "2025-09-10T14:00:00Z",
+        "created_at": "2025-09-01T10:00:00Z",
+        "updated_at": "2025-09-10T14:00:00Z"
+      },
+      {
+        "id": "pay_r2",
+        "customer_id": "cust_1",
+        "order_id": "ord_r2",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_r2",
+        "failure_reason": null,
+        "refund_reason": "broken eggs",
+        "processed_at": "2025-11-03T10:00:00Z",
+        "refunded_at": "2025-11-12T09:00:00Z",
+        "created_at": "2025-11-03T10:00:00Z",
+        "updated_at": "2025-11-12T09:00:00Z"
+      },
+      {
+        "id": "pay_r3",
+        "customer_id": "cust_1",
+        "order_id": "ord_r3",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_r3",
+        "failure_reason": null,
+        "refund_reason": "spoiled chicken",
+        "processed_at": "2026-02-09T10:00:00Z",
+        "refunded_at": "2026-02-18T11:30:00Z",
+        "created_at": "2026-02-09T10:00:00Z",
+        "updated_at": "2026-02-18T11:30:00Z"
+      },
+      {
+        "id": "pay_current",
+        "customer_id": "cust_1",
+        "order_id": "ord_current",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_current",
+        "failure_reason": null,
+        "refund_reason": null,
+        "processed_at": "2026-06-15T10:00:00Z",
+        "refunded_at": null,
+        "created_at": "2026-06-15T10:00:00Z",
+        "updated_at": "2026-06-15T10:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Morgan Taylor, an AcmeBox customer contacting support. Your most recent box (payment ID pay_current) arrived with visibly moldy produce — the zucchini had patches of green and white mold on it. You want a refund for this delivery.\n\nBehave like a real person and follow this flow:\n- Open by explaining your last box had moldy zucchini and asking for a refund. Be matter-of-fact, not hostile.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it before they ask.\n- When asked which payment to refund, give the ID: pay_current.\n- When the agent informs you that you have reached the lifetime refund limit and the refund cannot be issued, accept this explanation. You may express disappointment or ask for clarification, but ultimately acknowledge the policy and end the conversation politely.\n- Do NOT push the agent to override the policy or claim you deserve a special exception."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_current",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1", "status": "refunded" }
+        }
+      }
+    ]
+  }
+}

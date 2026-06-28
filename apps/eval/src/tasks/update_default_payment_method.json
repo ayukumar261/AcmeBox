@@ -1,0 +1,84 @@
+{
+  "id": "update_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "riley@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Riley",
+        "last_name": "Park",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "7 Pine Street",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "1111",
+        "expiry_month": 3,
+        "expiry_year": 2026,
+        "created_at": "2024-04-01T00:00:00Z"
+      },
+      {
+        "id": "pm_new",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "4444",
+        "expiry_month": 11,
+        "expiry_year": 2029,
+        "created_at": "2026-05-20T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Riley Park, an AcmeBox customer contacting support. You recently got a new Mastercard (ending in 4444) and want to switch your default payment method from your old Visa (ending in 1111, which expires soon) to the new Mastercard.\n\nBehave like a real person and follow this flow:\n- Open with your name and explain that you'd like to update your default payment method for deliveries.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Do not volunteer it before they ask.\n- When the agent asks which card you want as your new default, tell them your Mastercard ending in 4444.\n- Let the agent do the work of pulling up your saved cards and finding the right one. Don't hand over the payment method ID unless they specifically ask for it.\n- If the agent asks you to confirm the card, read back the details: Mastercard ending in 4444.\n- Once the agent confirms your Mastercard is now the default, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_payment_method_id": "pm_new" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "paymentMethodId": "pm_new" }
+        }
+      }
+    ]
+  }
+}
