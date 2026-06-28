@@ -41,3 +41,6 @@ __pycache__/
 # Misc
 .DS_Store
 *.pem
+
+# Claude
+.claude/
