@@ -1,0 +1,92 @@
+{
+  "id": "subscription_pause",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_7",
+        "email": "river.johnson@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "River",
+        "last_name": "Johnson",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "subscription_id": "sub_7",
+        "default_address_id": "addr_7",
+        "default_payment_method_id": "pm_7"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_7",
+        "customer_id": "cust_7",
+        "line1": "55 Harbor View",
+        "city": "Boston",
+        "region": "MA",
+        "postal_code": "02110",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_7",
+        "customer_id": "cust_7",
+        "brand": "amex",
+        "last4": "0001",
+        "expiry_month": 5,
+        "expiry_year": 2029
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_7",
+        "name": "Classic 2-Person Box",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 1050,
+        "shipping_fee": 0,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_7",
+        "customer_id": "cust_7",
+        "plan_id": "plan_7",
+        "status": "active",
+        "delivery_day": "thursday",
+        "delivery_address_id": "addr_7",
+        "payment_method_id": "pm_7",
+        "next_delivery_date": "2026-07-10T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are River Johnson, an AcmeBox customer. You're going on a three-week vacation and don't want meal kits delivered while you're away. You want to pause your subscription temporarily.\n\nBehave like a real person:\n- Open casually: you're heading on vacation and want to pause your subscription for a few weeks.\n- When the agent asks for your customer ID to verify your identity, give it: cust_7. Don't volunteer it before they ask.\n- If the agent asks for any more details about how long to pause, tell them you'll be away for about three weeks and will get in touch to resume when you're back.\n- Once the agent confirms your subscription is paused, thank them and you're done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_7",
+        "expect": { "status": "paused" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_7" } }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_7" },
+          "payload": { "status": "paused" }
+        }
+      }
+    ]
+  }
+}

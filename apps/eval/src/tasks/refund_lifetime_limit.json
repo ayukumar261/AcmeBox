@@ -1,0 +1,184 @@
+{
+  "id": "refund_lifetime_limit",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_4",
+        "email": "taylor.chen@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Taylor",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "subscription_id": "sub_4",
+        "default_address_id": "addr_4",
+        "default_payment_method_id": "pm_4"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_4",
+        "customer_id": "cust_4",
+        "line1": "100 Ocean Drive",
+        "city": "San Diego",
+        "region": "CA",
+        "postal_code": "92101",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_4",
+        "customer_id": "cust_4",
+        "brand": "visa",
+        "last4": "9999",
+        "expiry_month": 3,
+        "expiry_year": 2026
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_4",
+        "name": "Classic 2-Person Box",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 1100,
+        "shipping_fee": 0,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_4",
+        "customer_id": "cust_4",
+        "plan_id": "plan_4",
+        "status": "active",
+        "delivery_day": "tuesday",
+        "delivery_address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "next_delivery_date": "2026-07-07T12:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "order_4a",
+        "subscription_id": "sub_4",
+        "customer_id": "cust_4",
+        "status": "delivered",
+        "address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "delivery_date": "2026-04-01T12:00:00Z",
+        "price": 4400,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 2}]
+      },
+      {
+        "id": "order_4b",
+        "subscription_id": "sub_4",
+        "customer_id": "cust_4",
+        "status": "delivered",
+        "address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "delivery_date": "2026-04-22T12:00:00Z",
+        "price": 4400,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 2}]
+      },
+      {
+        "id": "order_4c",
+        "subscription_id": "sub_4",
+        "customer_id": "cust_4",
+        "status": "delivered",
+        "address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "delivery_date": "2026-05-13T12:00:00Z",
+        "price": 4400,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 2}]
+      },
+      {
+        "id": "order_4d",
+        "subscription_id": "sub_4",
+        "customer_id": "cust_4",
+        "status": "delivered",
+        "address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "delivery_date": "2026-06-17T12:00:00Z",
+        "price": 4400,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 2}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_4a",
+        "customer_id": "cust_4",
+        "order_id": "order_4a",
+        "subscription_id": "sub_4",
+        "payment_method_id": "pm_4",
+        "status": "refunded",
+        "amount": 4400,
+        "currency": "USD",
+        "refund_reason": "rotten lettuce"
+      },
+      {
+        "id": "pay_4b",
+        "customer_id": "cust_4",
+        "order_id": "order_4b",
+        "subscription_id": "sub_4",
+        "payment_method_id": "pm_4",
+        "status": "refunded",
+        "amount": 4400,
+        "currency": "USD",
+        "refund_reason": "cracked eggs"
+      },
+      {
+        "id": "pay_4c",
+        "customer_id": "cust_4",
+        "order_id": "order_4c",
+        "subscription_id": "sub_4",
+        "payment_method_id": "pm_4",
+        "status": "refunded",
+        "amount": 4400,
+        "currency": "USD",
+        "refund_reason": "spoiled chicken"
+      },
+      {
+        "id": "pay_4d",
+        "customer_id": "cust_4",
+        "order_id": "order_4d",
+        "subscription_id": "sub_4",
+        "payment_method_id": "pm_4",
+        "status": "succeeded",
+        "amount": 4400,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Taylor Chen, an AcmeBox customer. Your most recent delivery had spoiled meat in it — clearly off, with a bad smell. You want a refund for this delivery.\n\nBehave like a real person:\n- Open by explaining the problem: the meat in your last delivery was spoiled and smelled bad. You'd like a refund.\n- When the agent asks for your customer ID, give it: cust_4. Don't volunteer it before they ask.\n- The complaint is genuine: the meat really was spoiled. Stick to this story — don't back down or change your complaint.\n- If the agent tells you that you've reached a lifetime refund limit and cannot receive another refund, express disappointment but accept the decision and end the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_4d",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_4" } }
+      },
+      {
+        "tool": "payments_list",
+        "args": { "urlParams": { "customerId": "cust_4", "status": "refunded" } }
+      }
+    ]
+  }
+}

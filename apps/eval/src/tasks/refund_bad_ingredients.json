@@ -1,0 +1,119 @@
+{
+  "id": "refund_bad_ingredients",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_2",
+        "email": "alex.kim@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Alex",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "subscription_id": "sub_2",
+        "default_address_id": "addr_2",
+        "default_payment_method_id": "pm_2"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_2",
+        "customer_id": "cust_2",
+        "line1": "42 Maple Street",
+        "city": "Portland",
+        "region": "OR",
+        "postal_code": "97201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_2",
+        "customer_id": "cust_2",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 12,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_2",
+        "name": "Classic 2-Person Box",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 1000,
+        "shipping_fee": 0,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_2",
+        "customer_id": "cust_2",
+        "plan_id": "plan_2",
+        "status": "active",
+        "delivery_day": "wednesday",
+        "delivery_address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "next_delivery_date": "2026-07-09T12:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "order_2a",
+        "subscription_id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "delivered",
+        "address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "delivery_date": "2026-06-18T12:00:00Z",
+        "price": 4000,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 2}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_2a",
+        "customer_id": "cust_2",
+        "order_id": "order_2a",
+        "subscription_id": "sub_2",
+        "payment_method_id": "pm_2",
+        "status": "succeeded",
+        "amount": 4000,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Alex Kim, an AcmeBox customer. Your last meal kit delivery arrived with a bag of completely rotten cherry tomatoes — slimy and mouldy. You want a refund for that delivery.\n\nBehave like a real person:\n- Open by explaining the problem in your own words: the tomatoes were rotten, you want a refund. Keep it casual and short.\n- When the agent asks for your customer ID, give it: cust_2. Don't volunteer it before they ask.\n- If asked for more detail about what was wrong, explain: the cherry tomatoes were completely rotten and mouldy — inedible.\n- Once the agent confirms the refund has been processed, thank them and end the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_2a",
+        "expect": { "status": "refunded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_2" } }
+      },
+      {
+        "tool": "payments_list",
+        "args": { "urlParams": { "customerId": "cust_2", "status": "refunded" } }
+      },
+      {
+        "tool": "payments_refund",
+        "args": { "path": { "paymentId": "pay_2a" } }
+      }
+    ]
+  }
+}

@@ -28,7 +28,21 @@ an address ID. Before calling `addresses_setDefault`, you MUST:
 3. Only set as default an address that `addresses_list` actually returned for
    that customer.
 
-## 3. Refunds
+## 3. Verify a payment method before making it the default
+
+When a customer asks to change their default payment method, do not guess at a
+payment method ID. Before calling `paymentMethods_setDefault`, you MUST:
+
+1. Call the `paymentMethods_list` tool to fetch the customer's saved payment
+   methods. Do this every time, even if you have already seen payment method data
+   elsewhere — `paymentMethods_list` is the authoritative source and the required
+   check before any change.
+2. Confirm with the customer which card they mean (e.g. by brand and last 4
+   digits).
+3. Only set as default a payment method that `paymentMethods_list` actually
+   returned for that customer.
+
+## 4. Refunds
 
 Refunds are tightly controlled. Before issuing any refund you MUST have already
 verified the customer's identity (section 1), then:

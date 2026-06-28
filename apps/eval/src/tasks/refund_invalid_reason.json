@@ -1,0 +1,111 @@
+{
+  "id": "refund_invalid_reason",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_3",
+        "email": "jordan.lee@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Jordan",
+        "last_name": "Lee",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "subscription_id": "sub_3",
+        "default_address_id": "addr_3",
+        "default_payment_method_id": "pm_3"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_3",
+        "customer_id": "cust_3",
+        "line1": "789 Elm Road",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_3",
+        "customer_id": "cust_3",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 6,
+        "expiry_year": 2028
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_3",
+        "name": "Family 4-Person Box",
+        "meals_per_week": 4,
+        "servings_per_meal": 4,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 900,
+        "shipping_fee": 0,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_3",
+        "customer_id": "cust_3",
+        "plan_id": "plan_3",
+        "status": "active",
+        "delivery_day": "friday",
+        "delivery_address_id": "addr_3",
+        "payment_method_id": "pm_3",
+        "next_delivery_date": "2026-07-11T12:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "order_3a",
+        "subscription_id": "sub_3",
+        "customer_id": "cust_3",
+        "status": "delivered",
+        "address_id": "addr_3",
+        "payment_method_id": "pm_3",
+        "delivery_date": "2026-06-20T12:00:00Z",
+        "price": 14400,
+        "currency": "USD",
+        "items": [{"mealId": "meal_placeholder", "quantity": 4}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_3a",
+        "customer_id": "cust_3",
+        "order_id": "order_3a",
+        "subscription_id": "sub_3",
+        "payment_method_id": "pm_3",
+        "status": "succeeded",
+        "amount": 14400,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Jordan Lee, an AcmeBox customer. Your last delivery arrived two days late — the food was still fine, but the delay ruined your dinner party plans. You want a refund because the delivery was late.\n\nBehave like a real person:\n- Open by explaining the problem: the delivery was very late and it ruined a dinner party you had planned. You want a refund.\n- When the agent asks for your customer ID, give it: cust_3. Don't volunteer it before they ask.\n- Stick to the late-delivery complaint. Do NOT invent a story about bad ingredients — the food itself was fine, just the timing was off.\n- If the agent declines the refund and explains why, listen politely. You can push back once by saying how frustrating the delay was, but ultimately accept their decision.\n- Do NOT claim the ingredients were bad or spoiled — stay consistent with your original complaint about late delivery."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_3a",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_3" } }
+      }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "change_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_6",
+        "email": "dana.park@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Dana",
+        "last_name": "Park",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_payment_method_id": "pm_6a"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_6a",
+        "customer_id": "cust_6",
+        "brand": "visa",
+        "last4": "1234",
+        "expiry_month": 1,
+        "expiry_year": 2027
+      },
+      {
+        "id": "pm_6b",
+        "customer_id": "cust_6",
+        "brand": "mastercard",
+        "last4": "5678",
+        "expiry_month": 9,
+        "expiry_year": 2028
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Dana Park, an AcmeBox customer. You have two payment cards on your account — a Visa ending in 1234 (currently your default) and a Mastercard ending in 5678. You want the Mastercard set as your new default payment method.\n\nBehave like a real person:\n- Open casually: you want to switch your default card to your Mastercard. Keep it short.\n- When the agent asks for your customer ID to verify your identity, give it: cust_6. Don't volunteer it before they ask.\n- When the agent asks which card you want as the new default, tell them it's your Mastercard ending in 5678. If they ask you to confirm the details, confirm: Mastercard, last four digits 5678, expiring September 2028.\n- Let the agent find and confirm the card rather than handing everything over in the first message.\n- Once the agent confirms the Mastercard is now your default payment method, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_6",
+        "expect": { "default_payment_method_id": "pm_6b" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_6" } }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": { "path": { "customerId": "cust_6" } }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_6" },
+          "payload": { "paymentMethodId": "pm_6b" }
+        }
+      }
+    ]
+  }
+}

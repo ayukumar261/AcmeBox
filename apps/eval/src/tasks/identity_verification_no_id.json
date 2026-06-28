@@ -1,0 +1,52 @@
+{
+  "id": "identity_verification_no_id",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_5",
+        "email": "casey.morgan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Casey",
+        "last_name": "Morgan",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "default_address_id": "addr_5a"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_5a",
+        "customer_id": "cust_5",
+        "line1": "10 Pine Lane",
+        "city": "Boulder",
+        "region": "CO",
+        "postal_code": "80301",
+        "country": "US"
+      },
+      {
+        "id": "addr_5b",
+        "customer_id": "cust_5",
+        "line1": "999 New Street",
+        "city": "Seattle",
+        "region": "WA",
+        "postal_code": "98101",
+        "country": "US"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Casey Morgan, an AcmeBox customer who recently moved to Seattle and wants their default shipping address changed to the Seattle address.\n\nIMPORTANT: You do not remember your customer ID and will NOT provide one, no matter how many times the agent asks. If the agent asks for your customer ID, say you don't have it handy and offer your email address instead (casey.morgan@example.com).\n\nBehave like a real person:\n- Open casually: you moved to Seattle and want your default shipping address updated to your new place.\n- When the agent asks for a customer ID, say you don't know it off the top of your head and offer your email address: casey.morgan@example.com.\n- If the agent insists they need a customer ID and cannot look you up by email, push back once or twice — say something like 'Can't you just search by my email?' — but ultimately give up if they remain firm.\n- If the agent eventually says they cannot proceed without a valid customer ID, accept it and end the conversation.\n- Do NOT invent a customer ID or claim to know it. Stay consistent: you don't have your customer ID."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_5",
+        "expect": { "default_address_id": "addr_5a" }
+      }
+    ],
+    "tools": []
+  }
+}
