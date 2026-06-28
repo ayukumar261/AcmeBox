@@ -1,24 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import type { UIMessage } from "ai";
 import { Bot, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ChatInput } from "./ChatInput";
 import { MessageList } from "./MessageList";
 
-export function ChatPanel({ onClose }: { onClose: () => void }) {
+export function ChatPanel({
+  messages,
+  status,
+  stop,
+  onSend,
+  onClose,
+}: {
+  messages: UIMessage[];
+  status: string;
+  stop: () => void;
+  onSend: (text: string) => void;
+  onClose: () => void;
+}) {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
-  });
 
   function submit() {
     const text = input.trim();
     if (!text) return;
-    sendMessage({ text });
+    onSend(text);
     setInput("");
   }
 
