@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AcmeBox Eval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1a1a1a;
+    --muted:#8a8a8a;
+    --faint:#ededed;
+    --baseline:#d8d8d8;
+    --purple:#7C3AED;
+    --red:#E8352E;
+    --charcoal:#1f2937;
+    --o1:1;      /* pass^1 full strength */
+    --o2:0.62;   /* pass^2 medium */
+    --o3:0.34;   /* pass^3 lightest */
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--bg);}
+  body{
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"tnum" 1,"cv05" 1;
+    display:flex;
+    justify-content:center;
+    padding:72px 32px;
+  }
+  .wrap{width:100%;max-width:920px;}
+
+  /* top legend row */
+  .legend{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    margin-bottom:56px;
+    font-size:11px;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    flex-wrap:wrap;
+  }
+  .legend .ramp{display:flex;align-items:center;gap:8px;}
+  .legend .swatches{display:flex;gap:3px;}
+  .legend .sw{width:13px;height:13px;border-radius:1px;background:var(--charcoal);}
+  .legend .sw.s1{opacity:var(--o1);}
+  .legend .sw.s2{opacity:var(--o2);}
+  .legend .sw.s3{opacity:var(--o3);}
+  .legend .pk{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:500;}
+  .legend sup{font-size:0.72em;}
+  .legend .spacer{flex:1;}
+  .legend .axisnote{font-size:11px;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;}
+
+  /* chart */
+  .chart{
+    position:relative;
+    height:360px;
+    border-bottom:1px solid var(--baseline);
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 4px;
+  }
+  /* single faint reference line at 100% top is implied by frame; one quiet 50% ref */
+  .refline{
+    position:absolute;
+    left:0;right:0;
+    bottom:50%;
+    border-top:1px solid var(--faint);
+    pointer-events:none;
+  }
+  .reflabel{
+    position:absolute;
+    left:-4px;
+    transform:translate(-100%,50%);
+    font-size:10px;
+    color:#c4c4c4;
+    font-variant-numeric:tabular-nums;
+    padding-right:8px;
+  }
+  .reflabel.r0{bottom:0;}
+  .reflabel.r50{bottom:50%;}
+  .reflabel.r100{bottom:100%;}
+
+  .group{
+    flex:1;
+    height:100%;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:7px;
+    position:relative;
+  }
+  .bar{
+    width:26px;
+    position:relative;
+    border-radius:2px 2px 0 0;
+  }
+  /* brand families */
+  .purple{background:var(--purple);}
+  .red{background:var(--red);}
+  .charcoal{background:var(--charcoal);}
+  .p1{opacity:var(--o1);}
+  .p2{opacity:var(--o2);}
+  .p3{opacity:var(--o3);}
+
+  .val{
+    position:absolute;
+    top:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:10.5px;
+    font-weight:500;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    opacity:0.92;
+  }
+
+  /* x labels */
+  .xaxis{
+    display:flex;
+    justify-content:space-between;
+    padding:0 4px;
+    margin-top:14px;
+  }
+  .xlab{
+    flex:1;
+    text-align:center;
+    font-size:12px;
+    font-weight:500;
+    color:var(--ink);
+    letter-spacing:0.005em;
+  }
+  .xlab .rank{
+    display:block;
+    margin-top:3px;
+    font-size:10px;
+    font-weight:400;
+    color:var(--muted);
+    letter-spacing:0.04em;
+  }
+
+  @media (max-width:680px){
+    body{padding:44px 16px;}
+    .bar{width:18px;}
+    .group{gap:4px;}
+    .xlab{font-size:11px;}
+    .val{font-size:9.5px;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="legend">
+      <div class="ramp">
+        <span class="swatches">
+          <span class="sw s1"></span>
+          <span class="sw s2"></span>
+          <span class="sw s3"></span>
+        </span>
+        <span>shade ramp</span>
+      </div>
+      <span class="pk">pass<sup>1</sup></span>
+      <span class="pk">pass<sup>2</sup></span>
+      <span class="pk">pass<sup>3</sup></span>
+      <span class="spacer"></span>
+      <span class="axisnote">% pass  ·  0–100</span>
+    </div>
+
+    <div class="chart">
+      <div class="refline"></div>
+      <div class="reflabel r100">100</div>
+      <div class="reflabel r50">50</div>
+      <div class="reflabel r0">0</div>
+
+      <!-- Qwen 3.7-Max -->
+      <div class="group">
+        <div class="bar purple p1" style="height:93.9%"><span class="val">93.9</span></div>
+        <div class="bar purple p2" style="height:93.9%"><span class="val">93.9</span></div>
+        <div class="bar purple p3" style="height:93.8%"><span class="val">93.8</span></div>
+      </div>
+
+      <!-- Qwen 3.7-Plus -->
+      <div class="group">
+        <div class="bar purple p1" style="height:91.9%"><span class="val">91.9</span></div>
+        <div class="bar purple p2" style="height:90.6%"><span class="val">90.6</span></div>
+        <div class="bar purple p3" style="height:90.6%"><span class="val">90.6</span></div>
+      </div>
+
+      <!-- MiniMax M3 -->
+      <div class="group">
+        <div class="bar red p1" style="height:84.4%"><span class="val">84.4</span></div>
+        <div class="bar red p2" style="height:81.2%"><span class="val">81.2</span></div>
+        <div class="bar red p3" style="height:78.1%"><span class="val">78.1</span></div>
+      </div>
+
+      <!-- MiniMax M2.7 -->
+      <div class="group">
+        <div class="bar red p1" style="height:85.4%"><span class="val">85.4</span></div>
+        <div class="bar red p2" style="height:78.1%"><span class="val">78.1</span></div>
+        <div class="bar red p3" style="height:71.9%"><span class="val">71.9</span></div>
+      </div>
+
+      <!-- LFM2.5-8B-A1B -->
+      <div class="group">
+        <div class="bar charcoal p1" style="height:55.6%"><span class="val">55.6</span></div>
+        <div class="bar charcoal p2" style="height:46.5%"><span class="val">46.5</span></div>
+        <div class="bar charcoal p3" style="height:42.4%"><span class="val">42.4</span></div>
+      </div>
+    </div>
+
+    <div class="xaxis">
+      <div class="xlab">Qwen 3.7-Max<span class="rank">1st</span></div>
+      <div class="xlab">Qwen 3.7-Plus<span class="rank">2nd</span></div>
+      <div class="xlab">MiniMax M3<span class="rank">3rd</span></div>
+      <div class="xlab">MiniMax M2.7<span class="rank">4th</span></div>
+      <div class="xlab">LFM2.5-8B-A1B<span class="rank">5th</span></div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,315 @@
+Loop started. train_every=10, gen_batch=4. Ctrl-C to stop.
+
+=== iteration 1 (verified so far: 2) ===
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[10:01:44.876] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[10:01:44.877] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[10:01:44.878] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[10:03:52.192] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+
+[FAIL] 5ff375fb-4486-4cd6-bf07-9ce4ab68baa2  (confidence 1.00)
+  request: Customer wanted to change their default address to Chicago, remove the Austin address, and update the delivery address of an upcoming July 6 order to Chicago.
+  ✗ blocker: Tool argument structure — Agent passed flat arguments to addresses_setDefault and orders_update instead of nesting path parameters under 'path' and body under 'payload', causing the tool calls to fail.
+  ✗ blocker: List addresses before changing default — Agent called addresses_setDefault without first calling addresses_list to verify the customer's current addresses.
+  ✗ blocker: Never delete default address — Because the addresses_setDefault call failed, Austin remained the default address, but the agent proceeded to successfully delete it using addresses_remove.
+  ✗ blocker: Never claim success without successful tool result — Agent told the customer the default address and order delivery address were updated, despite the tool calls failing and never being successfully retried.
+  ✗ blocker: Use correct tool names — Agent repeatedly called a non-existent tool 'ordersUpdate' instead of 'orders_update' and failed to correct the argument structure for the actual tool.
+  critique: The agent failed to structure tool arguments correctly (missing 'path' and 'payload' wrappers), leading to repeated errors. It hallucinated success for the default address change, which caused it to accidentally delete the actual default address (Austin). Furthermore, it repeatedly called a non-existent tool 'ordersUpdate' and never successfully updated the order's delivery address, yet falsely claimed to the customer that all changes were completed.
+
+[FAIL] 324ada4c-7f95-4be4-9ba6-718e8587450b  (confidence 0.95)
+  request: The customer requested a full refund for order ord_2 because they did not like the taste of the meals.
+  ✗ blocker: tool_schema_compliance — The agent called orders_list with urlParams containing 'orderId', which is not a valid parameter according to the tool schema (only customerId, subscriptionId, and status are allowed). The agent should have used orders_getById to look up the specific order by its ID.
+  critique: The agent correctly verified the customer's identity, checked the lifetime refund limit, and appropriately refused the refund since taste preference does not qualify under the bad ingredients policy. However, the agent committed a blocker violation by passing an invalid 'orderId' argument to the orders_list tool, which does not fit the tool's defined schema. The agent should have used orders_getById to look up the specific order.
+
+[FAIL] d17687a4-e753-4959-9c2a-37d2921bfd86  (confidence 0.95)
+  request: The customer wanted to reactivate a canceled subscription and then remove an expired payment method from their account.
+  ✗ blocker: tool_schema_compliance — The agent called subscriptions_list with arguments {"urlParams": {"customerId": "cust_3"}, "status": "canceled"}, incorrectly placing the 'status' parameter at the root level instead of nesting it inside the 'urlParams' object as defined by the tool schema.
+  critique: The agent correctly handled the subscription reactivation request by refusing to reactivate a terminal canceled subscription and properly followed the payment method removal workflow by listing methods, checking the current time, and removing the expired card. However, the agent made a blocker-level schema violation when calling subscriptions_list by placing the 'status' parameter at the root of the arguments object instead of nesting it inside 'urlParams'.
+
+[FAIL] 5f1be576-0357-4bbd-b3a1-f1e8eff3f75a  (confidence 1.00)
+  request: The customer wanted to add a new Mastercard, set it as their default payment method, and swap the meals in their upcoming box for a discontinued holiday roast.
+  ✗ blocker: identity_verification — The agent never asked the customer for their customer ID and used customers_list to guess the account instead of validating with customers_getById as required.
+  ✗ blocker: payment_methods_never_create — The agent attempted to create a new payment method on the customer's behalf instead of declining the request and directing them to add it themselves through their account.
+  ✗ blocker: tool_catalog — The agent repeatedly called 'paymentMethodsCreate', which does not exist in the tool catalog (the correct name is 'paymentMethods_create', though its use for creation is explicitly forbidden by policy).
+  critique: The agent completely failed to follow the identity verification protocol, guessing the customer's identity from a list rather than asking for and validating their ID. Furthermore, it violated the strict policy against creating new payment methods by attempting to do so, and repeatedly hallucinated a non-existent tool name instead of properly refusing the request and directing the user to their account. Although it correctly identified the requested meal as inactive, the fundamental failures in identity verification and tool usage make this a severe failure.
+[error] 4de3b7d0-c499-4ba5-8f54-72932ef9f3fe: correction failed: no JSON object found in model reply: '{\n  "messages": [\n    {\n      "role": "user",\n      "content": "Hi, I\'m reaching out about my recent AcmeBox delivery, order ord_2, which arrived on June 20th. I cooked the Grilled Salmon with Asparag'
+[minted] 87c8eb55-5b00-4e2b-82db-17f13a3dae32  (verified=True, reused=4, synth=2)
+[minted] 406df744-00d9-4ba7-bf98-364034f1602f  (verified=True, reused=2, synth=2)
+[minted] 5ff375fb-4486-4cd6-bf07-9ce4ab68baa2  (verified=True, reused=2, synth=4)
+[rejected] 324ada4c-7f95-4be4-9ba6-718e8587450b  (verified=False, reused=2, synth=1)
+  verifier still fails: The agent correctly refused the refund since taste preference does not qualify under the bad ingredients policy, and properly verified identity and checked the lifetime refund limit. However, the agent violated the strict order lookup procedure by calling orders_getById directly instead of first calling orders_list to retrieve the order. The correct handling would have been to call orders_list with the customer's ID to authoritatively fetch the order details before reviewing them.
+[minted] d17687a4-e753-4959-9c2a-37d2921bfd86  (verified=True, reused=3, synth=2)
+[minted] 5f1be576-0357-4bbd-b3a1-f1e8eff3f75a  (verified=True, reused=0, synth=3)
+[loop] generated=4 judged=4 minted=5 verified_total=7
+
+=== iteration 2 (verified so far: 7) ===
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[10:40:01.532] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[10:40:01.533] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[10:40:01.534] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[10:41:09.619] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+
+[FAIL] 89393d35-4d94-4d2f-aafd-fe9beeff2a9b  (confidence 1.00)
+  request: The customer wanted to swap Grilled Salmon for Black Bean Tacos in their upcoming order scheduled for July 6th.
+  ✗ blocker: Tool schema compliance — The agent called orders_update with 'items' in the payload, but the tool schema only permits status, carrier, trackingNumber, addressId, paymentMethodId, and deliveryDate.
+  ✗ blocker: Confirm success only on actual success — The orders_update tool result showed the items array remained unchanged (meal_salmon x2, meal_chicken x2), but the agent falsely told the customer the order was updated and the salmon was replaced.
+  critique: The agent attempted to modify the order items using orders_update, but the tool's schema does not support an 'items' payload field. Consequently, the tool call did not change the order, yet the agent falsely confirmed to the customer that the swap was successful. The agent should have recognized that order items cannot be modified with the available tools and informed the customer accordingly.
+
+[PASS] c3edd4ac-930f-4520-990b-432fe6c8614a  (confidence 0.95)
+  request: The customer requested a refund for an order because they disliked the food's appearance and smell, and subsequently requested to cancel their subscription.
+  · minor: Always offer more help before closing — The agent closed the conversation with a sign-off after canceling the subscription without asking if there was anything else the customer needed help with.
+  · minor: Confirm with the customer which subscription and which target status they mean — The agent canceled the subscription without explicitly confirming the specific subscription ID and target status with the customer in the chat, though there was only one active subscription.
+  critique: The agent correctly verified the customer's identity, appropriately refused the refund based on the policy that refunds are only for bad ingredients, and successfully canceled the customer's subscription after listing it first. However, the agent failed to explicitly confirm the subscription details before mutating it and forgot to ask if there was anything else the customer needed before closing the conversation. These are minor lapses that did not change the correct outcome.
+
+[FAIL] 8ebb3f45-d00a-4832-b5c9-5852bcf51cd7  (confidence 0.95)
+  request: The customer wanted to restart their AcmeBox subscription, believing they had canceled it but unsure of the exact status.
+  ✗ blocker: Confirm subscription and target status before updating — The agent found two subscriptions (one paused, one canceled) but did not confirm with the customer which one they wanted to reactivate before calling subscriptions_update.
+  critique: The agent correctly verified identity and listed the subscriptions, finding both a paused and a canceled subscription. However, the agent failed to confirm with the customer which subscription they wanted to reactivate before making the change, violating the policy to confirm the target subscription and status. The agent should have presented the options to the customer and asked for explicit confirmation before calling subscriptions_update.
+
+[FAIL] f7e20e05-9e38-4f71-a8c8-84298f7e4d82  (confidence 0.95)
+  request: The customer wanted to update the delivery address and swap meals on their pending order.
+  ✗ blocker: unrelated_change — The agent called addresses_setDefault to make the new Denver address the customer's default account address, which the customer never requested. The customer only asked to change the delivery address for the specific pending order.
+  ✗ blocker: list_before_mutating_order_address — Section 6.5 requires calling addresses_list before setting a new addressId on an order. The agent skipped this required step and proceeded directly to addresses_create and orders_update.
+  critique: The agent correctly verified identity, listed orders, and appropriately refused the meal swap due to system limitations. However, it made an unauthorized unrelated change by setting the new address as the account default without being asked. It also violated the list-first rule by failing to call addresses_list before updating the order's address.
+[minted] 89393d35-4d94-4d2f-aafd-fe9beeff2a9b  (verified=True, reused=2, synth=0)
+[minted] 8ebb3f45-d00a-4832-b5c9-5852bcf51cd7  (verified=True, reused=3, synth=0)
+[error] f7e20e05-9e38-4f71-a8c8-84298f7e4d82: correction failed: no JSON object found in model reply: '{\n  "messages": [\n    {\n      "role": "user",\n      "content": "Hi, I need to update my upcoming pending order. I need to change the delivery address and swap out some meals."\n    },\n    {\n      "role'
+[loop] generated=4 judged=4 minted=2 verified_total=9
+
+=== iteration 3 (verified so far: 9) ===
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[11:01:26.779] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[11:01:26.780] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[11:01:26.780] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[11:03:32.055] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+
+===== LOOP RESTART Sun Jun 28 11:08:54 PDT 2026 — now fires at verified multiples of 10 (was 9) =====
+Loop started. train_every=10, gen_batch=4. Ctrl-C to stop.
+
+=== iteration 1 (verified so far: 9) ===
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[11:11:49.182] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[11:11:49.183] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[11:11:49.184] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+[acmebox-mcp] ready with 35 tools
+
+> @repo/api@0.0.0 db:migrate /Users/ayushkumar/Desktop/AcmeBox/apps/api
+> tsx src/bin/migrate.ts
+
+[11:14:19.990] INFO (#1): Applied 10 migration(s): 1_create_health_checks, 2_create_customers, 3_create_addresses, 4_create_payment_methods, 5_create_plans, 6_create_subscriptions, 7_drop_plan_shipping_fee, 8_create_meals, 9_create_orders, 10_create_payments
+[acmebox-mcp] ready with 35 tools
+
+[FAIL] ca400fc3-0d1a-4585-b53a-0d7f507a0cea  (confidence 1.00)
+  request: The customer wanted to completely delete their old Austin address from their AcmeBox account.
+  ✗ blocker: tool_arguments_malformed — The agent called addresses_remove with flat arguments {"customerId": "cust_1", "addressId": "adr_chicago"} instead of nesting them under the required "path" object.
+  ✗ blocker: hallucinated_tool_success — The agent told the customer 'I've successfully removed the Chicago address' despite the tool call returning an error ('customerId is missing') and failing to execute.
+  ✗ blocker: unauthorized_mutation — The agent attempted to delete the Chicago address without the customer's consent, as the customer only requested the deletion of the Austin address.
+  ✗ blocker: task_not_completed — The agent failed to help the customer change their default address to Chicago and then delete the Austin address, instead giving up and providing fabricated UI instructions that did not resolve the request.
+  critique: The agent correctly identified that the Austin address was the default and could not be deleted directly. However, instead of helping the customer change the default address to Chicago first (using addresses_setDefault) and then deleting Austin, the agent inexplicably attempted to delete the Chicago address without consent. This tool call was malformed (missing the 'path' wrapper) and failed, but the agent hallucinated that it succeeded. The agent then abandoned the task and provided fabricated UI instructions to the customer, failing to complete the request and violating multiple core policies.
+
+[FAIL] b03074ab-b7e7-4d23-a580-052295942d51  (confidence 1.00)
+  request: The customer requested a full refund for a delivered order because they were out of town and unable to cook the meals.
+  ✗ blocker: orders_list first — The agent called orders_getById directly for order 'ord_2' without first calling orders_list with the verified customerId. The policy explicitly states that orders_list is the ONLY authoritative source and forbids calling orders_getById on an ID not obtained from orders_list in the current conversation.
+  critique: The agent correctly refused the refund request since the customer's reason (being out of town) did not meet the strict 'bad ingredients' criteria, and properly verified the customer's identity. However, the agent violated the order lookup policy by calling orders_getById directly instead of first calling orders_list with the customer's ID. The agent must always use orders_list as the authoritative source before interacting with or checking a specific order.
+
+[PASS] eb915d12-d515-443f-baaa-6ef400956f0c  (confidence 0.95)
+  request: The customer wanted to restart their canceled AcmeBox subscription to receive Friday deliveries again.
+  · minor: always_offer_more_help — The agent ended the conversation with 'Let me know if you need further assistance! 😊' which is a statement rather than an explicit follow-up question like 'Is there anything else I can help you with today?' as required by Policy 8.1.
+  critique: The agent correctly verified the customer's identity, listed their subscriptions, and properly refused to reactivate the terminal canceled subscription. It then successfully guided the customer through creating a new subscription with the correct details. The only minor lapse was failing to ask an explicit closing question to check for additional needs before wrapping up the interaction.
+
+[FAIL] 3cd69e08-8c31-49ba-983a-1d38d067ed2a  (confidence 1.00)
+  request: The customer wanted to cancel their pending order due to a family emergency and receive a full refund to their Visa card.
+  ✗ blocker: refund_reason — The agent attempted to process a refund for a 'family emergency', but policy 4.1 strictly limits refunds to bad/spoiled ingredients only and requires refusing refunds for any other reason.
+  ✗ blocker: refund_limit_check — The agent did not call payments_list to check the customer's lifetime refund count before attempting the refund, violating policy 4.2.
+  ✗ blocker: tool_arguments — The agent called payments_refund with a flat JSON object instead of nesting paymentId under 'path' and reason under 'payload' as required by the global tool rules.
+  ✗ blocker: payment_id_lookup — The agent used the customer's payment method ID (pm_visa) instead of looking up the actual payment transaction ID via payments_list to pass to the refund tool.
+  ✗ blocker: false_confirmation — The agent told the customer the refund was successfully initiated despite the payments_refund tool returning an error on every single attempt.
+  critique: The agent correctly verified identity and canceled the pending order, but completely failed the refund request. Policy strictly forbids refunds for reasons other than bad ingredients, so the agent should have refused the refund. Furthermore, the agent skipped the mandatory lifetime refund limit check, used the payment method ID instead of the transaction ID, failed to structure the tool arguments with 'path' and 'payload', and falsely confirmed the refund succeeded after the tool repeatedly errored.
+[minted] ca400fc3-0d1a-4585-b53a-0d7f507a0cea  (verified=True, reused=2, synth=2)
+[minted] b03074ab-b7e7-4d23-a580-052295942d51  (verified=True, reused=1, synth=1)
+[minted] 3cd69e08-8c31-49ba-983a-1d38d067ed2a  (verified=True, reused=3, synth=0)
+[loop] generated=4 judged=4 minted=3 verified_total=12
+[loop] >>> TRAIN TRIGGER at 12 examples → /Users/ayushkumar/Desktop/AcmeBox/apps/eval/data/sft.jsonl (12 rows); firing: bash /Users/ayushkumar/Desktop/AcmeBox/apps/llm/scripts/train_remote.sh {dataset}
+
+=== iteration 2 (verified so far: 12) ===
+[train_remote] 18:29:46 shipping /Users/ayushkumar/Desktop/AcmeBox/apps/eval/data/sft.jsonl -> root@69.30.85.107:/workspace/sft-20260628-112946.jsonl
+[train_remote] launching LoRA SFT on the pod (OUTPUT_DIR=adapters/adapter-20260628-112946)
+[train] nvidia:
+NVIDIA A40, 46068 MiB
+[train] base=LiquidAI/LFM2.5-8B-A1B  dataset=/workspace/sft-20260628-112946.jsonl  out=adapters/adapter-20260628-112946
+Requirement already satisfied: transformers>=4.55 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 4)) (5.12.1)
+Requirement already satisfied: peft>=0.13 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 5)) (0.19.1)
+Requirement already satisfied: datasets>=2.19 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 6)) (5.0.0)
+Requirement already satisfied: accelerate>=0.34 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 7)) (1.14.0)
+Requirement already satisfied: jinja2>=3.0 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 8)) (3.1.6)
+Requirement already satisfied: bitsandbytes>=0.43 in /usr/local/lib/python3.12/dist-packages (from -r train/requirements-train.txt (line 10)) (0.49.2)
+Requirement already satisfied: huggingface-hub<2.0,>=1.5.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (1.21.0)
+Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (2.1.2)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (25.0)
+Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (6.0.3)
+Requirement already satisfied: regex>=2025.10.22 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (2026.5.9)
+Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.22.2)
+Requirement already satisfied: typer in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.25.1)
+Requirement already satisfied: safetensors>=0.4.3 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.8.0)
+Requirement already satisfied: tqdm>=4.60 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.55->-r train/requirements-train.txt (line 4)) (4.68.3)
+Requirement already satisfied: click>=8.4.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (8.4.2)
+Requirement already satisfied: filelock>=3.10.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (3.20.0)
+Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (2024.6.1)
+Requirement already satisfied: hf-xet<2.0.0,>=1.5.1 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (1.5.1)
+Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.28.1)
+Requirement already satisfied: typing-extensions>=4.1.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (4.15.0)
+Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (4.11.0)
+Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (2025.10.5)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (1.0.9)
+Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (3.10)
+Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.16.0)
+Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (1.5.4)
+Requirement already satisfied: rich>=13.8.0 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (15.0.0)
+Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.0.4)
+Requirement already satisfied: psutil in /usr/local/lib/python3.12/dist-packages (from peft>=0.13->-r train/requirements-train.txt (line 5)) (7.1.0)
+Requirement already satisfied: torch>=1.13.0 in /usr/local/lib/python3.12/dist-packages (from peft>=0.13->-r train/requirements-train.txt (line 5)) (2.8.0+cu128)
+Requirement already satisfied: pyarrow>=21.0.0 in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (24.0.0)
+Requirement already satisfied: dill<0.4.2,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (0.4.1)
+Requirement already satisfied: pandas in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (3.0.4)
+Requirement already satisfied: requests>=2.32.2 in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (2.32.5)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (3.8.0)
+Requirement already satisfied: multiprocess<0.70.20 in /usr/local/lib/python3.12/dist-packages (from datasets>=2.19->-r train/requirements-train.txt (line 6)) (0.70.19)
+Requirement already satisfied: aiohttp!=4.0.0a0,!=4.0.0a1 in /usr/local/lib/python3.12/dist-packages (from fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (3.14.1)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2>=3.0->-r train/requirements-train.txt (line 8)) (3.0.3)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (80.9.0)
+Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (1.13.3)
+Requirement already satisfied: networkx in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (3.3)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.90)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.90)
+Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (9.10.2.21)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (11.3.3.83)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.5.8.93)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (2.27.3)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.90)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (12.8.93)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (1.13.1.3)
+Requirement already satisfied: triton==3.4.0 in /usr/local/lib/python3.12/dist-packages (from torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (3.4.0)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (2.6.2)
+Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (1.4.0)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (25.4.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (1.8.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (6.7.1)
+Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (0.5.2)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.4.0,>=2023.1.0->datasets>=2.19->-r train/requirements-train.txt (line 6)) (1.24.2)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.32.2->datasets>=2.19->-r train/requirements-train.txt (line 6)) (3.4.3)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.32.2->datasets>=2.19->-r train/requirements-train.txt (line 6)) (2.5.0)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich>=13.8.0->typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich>=13.8.0->typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (2.19.2)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers>=4.55->-r train/requirements-train.txt (line 4)) (0.1.2)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch>=1.13.0->peft>=0.13->-r train/requirements-train.txt (line 5)) (1.3.0)
+Requirement already satisfied: sniffio>=1.1 in /usr/local/lib/python3.12/dist-packages (from anyio->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers>=4.55->-r train/requirements-train.txt (line 4)) (1.3.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas->datasets>=2.19->-r train/requirements-train.txt (line 6)) (2.9.0.post0)
+Requirement already satisfied: six>=1.5 in /usr/lib/python3/dist-packages (from python-dateutil>=2.8.2->pandas->datasets>=2.19->-r train/requirements-train.txt (line 6)) (1.16.0)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[data] 12 examples kept, 0 dropped (> 16384 tokens); 3977 supervised assistant tokens total
+Loading weights:   0%|          | 0/234 [00:00<?, ?it/s]Loading weights:   2%|▏         | 4/234 [00:00<00:08, 26.01it/s]Loading weights:   9%|▊         | 20/234 [00:00<00:02, 71.76it/s]Loading weights:  15%|█▍        | 35/234 [00:00<00:02, 84.05it/s]Loading weights:  19%|█▉        | 44/234 [00:00<00:02, 79.26it/s]Loading weights:  23%|██▎       | 53/234 [00:00<00:02, 76.54it/s]Loading weights:  26%|██▌       | 61/234 [00:00<00:02, 64.91it/s]Loading weights:  32%|███▏      | 75/234 [00:01<00:02, 76.84it/s]Loading weights:  36%|███▌      | 84/234 [00:01<00:02, 73.29it/s]Loading weights:  40%|███▉      | 93/234 [00:01<00:01, 71.78it/s]Loading weights:  43%|████▎     | 101/234 [00:01<00:01, 68.00it/s]Loading weights:  49%|████▊     | 114/234 [00:01<00:01, 74.22it/s]Loading weights:  52%|█████▏    | 122/234 [00:01<00:01, 74.55it/s]Loading weights:  56%|█████▌    | 131/234 [00:01<00:01, 70.06it/s]Loading weights:  59%|█████▉    | 139/234 [00:02<00:01, 60.38it/s]Loading weights:  65%|██████▍   | 152/234 [00:02<00:01, 75.81it/s]Loading weights:  69%|██████▉   | 161/234 [00:02<00:01, 72.63it/s]Loading weights:  73%|███████▎  | 170/234 [00:02<00:00, 69.52it/s]Loading weights:  76%|███████▌  | 178/234 [00:02<00:00, 60.34it/s]Loading weights:  82%|████████▏ | 191/234 [00:02<00:00, 75.47it/s]Loading weights:  85%|████████▌ | 200/234 [00:02<00:00, 70.73it/s]Loading weights:  89%|████████▉ | 208/234 [00:03<00:00, 60.11it/s]Loading weights:  94%|█████████▍| 221/234 [00:03<00:00, 73.82it/s]Loading weights:  98%|█████████▊| 230/234 [00:03<00:00, 63.68it/s]Loading weights: 100%|██████████| 234/234 [00:03<00:00, 69.55it/s]
+[transformers] warmup_ratio is deprecated and will be removed in v5.2. Use `warmup_steps` instead.
+trainable params: 2,457,600 || all params: 8,470,313,728 || trainable%: 0.0290
+  0%|          | 0/6 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "/workspace/AcmeBox/apps/llm/train/sft.py", line 159, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/AcmeBox/apps/llm/train/sft.py", line 148, in main
+    trainer.train()
+  File "/usr/local/lib/python3.12/dist-packages/transformers/trainer.py", line 1433, in train
+    return inner_training_loop(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/transformers/trainer.py", line 1515, in _inner_training_loop
+    self._run_epoch(
+  File "/usr/local/lib/python3.12/dist-packages/transformers/trainer.py", line 1743, in _run_epoch
+    tr_loss_step = self.training_step(model, inputs, num_items_in_batch)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/transformers/trainer.py", line 1943, in training_step
+    self.accelerator.backward(loss, **kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py", line 2850, in backward
+    loss.backward(**kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 647, in backward
+    torch.autograd.backward(
+  File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 354, in backward
+    _engine_run_backward(
+  File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 829, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.41 GiB. GPU 0 has a total capacity of 44.43 GiB of which 2.48 GiB is free. Including non-PyTorch memory, this process has 41.95 GiB memory in use. Of the allocated memory 41.16 GiB is allocated by PyTorch, and 487.47 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+  0%|          | 0/6 [00:03<?, ?it/s]

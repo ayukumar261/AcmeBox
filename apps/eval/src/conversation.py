@@ -152,6 +152,11 @@ class Conversation:
 
     transcript: list[dict[str, str]] = field(default_factory=list)
     tool_calls: list[ToolResult] = field(default_factory=list)
+    # The agent's full OpenAI-format message history (system + user + assistant
+    # with tool_calls + tool results), interleaved. The eval grader ignores this;
+    # the flywheel's scenario generator uses it to store a training-quality
+    # transcript with tool calls inline.
+    messages: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _agent_system_prompt(task: Task) -> str:
@@ -288,4 +293,7 @@ async def run_conversation(
         convo.transcript.append({"role": "assistant", "content": agent_text})
         user_msgs.append({"role": "user", "content": agent_text})
 
+    # Expose the agent's full interleaved history (with tool calls/results) for
+    # callers that want to persist it; the system prompt stays at index 0.
+    convo.messages = agent_msgs
     return convo

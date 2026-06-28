@@ -1,0 +1,41 @@
+{
+  "id": "paused_expired",
+  "customerId": "cust_3",
+  "description": "Priya Patel (cust_3): a PAUSED subscription (sub_paused) and a separately CANCELED subscription (sub_canceled), plus an EXPIRED Visa (pm_expired, exp 03/2023) alongside a valid Mastercard default (pm_valid). Good for: resuming/reactivating the paused sub, trying to reactivate the canceled sub (policy should refuse — canceled is terminal), deleting the expired card, or switching the default off the expired card.",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_3",
+        "email": "priya@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Priya",
+        "last_name": "Patel",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_address_id": "adr_boston",
+        "default_payment_method_id": "pm_valid"
+      }
+    ],
+    "addresses": [
+      { "id": "adr_boston", "customer_id": "cust_3", "line1": "12 Beacon St", "city": "Boston", "region": "MA", "postal_code": "02108", "country": "US" }
+    ],
+    "payment_methods": [
+      { "id": "pm_valid", "customer_id": "cust_3", "brand": "mastercard", "last4": "1111", "expiry_month": 9, "expiry_year": 2028 },
+      { "id": "pm_expired", "customer_id": "cust_3", "brand": "visa", "last4": "4242", "expiry_month": 3, "expiry_year": 2023 }
+    ],
+    "plans": [
+      { "id": "plan_4wk", "name": "4 Meals Per Week", "meals_per_week": 4, "servings_per_meal": 2, "currency": "USD", "country": "US", "price_per_serving": 999, "active": true }
+    ],
+    "meals": [
+      { "id": "meal_salmon", "name": "Grilled Salmon with Asparagus", "steps": ["Roast salmon 15 min", "Serve with asparagus"], "ingredients": ["salmon fillet", "asparagus", "lemon"], "is_active": true },
+      { "id": "meal_chicken", "name": "Herb-Crusted Chicken Breast", "steps": ["Coat with herbs", "Pan-sear"], "ingredients": ["chicken breast", "thyme", "garlic"], "is_active": true },
+      { "id": "meal_tacos", "name": "Black Bean Tacos", "steps": ["Warm tortillas", "Assemble"], "ingredients": ["corn tortillas", "black beans", "avocado"], "is_active": true }
+    ],
+    "subscriptions": [
+      { "id": "sub_paused", "customer_id": "cust_3", "status": "paused", "plan_id": "plan_4wk", "delivery_day": "wednesday", "delivery_address_id": "adr_boston", "payment_method_id": "pm_valid", "next_delivery_date": "2026-07-08T00:00:00Z" },
+      { "id": "sub_canceled", "customer_id": "cust_3", "status": "canceled", "plan_id": "plan_4wk", "delivery_day": "friday", "delivery_address_id": "adr_boston", "payment_method_id": "pm_valid", "next_delivery_date": "2026-05-01T00:00:00Z" }
+    ]
+  }
+}

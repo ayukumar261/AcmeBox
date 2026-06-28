@@ -1,0 +1,46 @@
+{
+  "id": "active_pending",
+  "customerId": "cust_1",
+  "description": "Sam Rivera (cust_1): an ACTIVE 4-meals/week subscription, one PENDING order not yet shipped, two saved cards (Visa default + Amex), two addresses (Austin default + Chicago), and the meals catalog. Good for: changing a pending order's address/payment, rescheduling the next delivery, pausing the subscription, changing plan, setting a new default address/payment, browsing meals, cancelling the pending order.",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_austin",
+        "default_payment_method_id": "pm_visa"
+      }
+    ],
+    "addresses": [
+      { "id": "adr_austin", "customer_id": "cust_1", "line1": "123 Main St", "city": "Austin", "region": "TX", "postal_code": "73301", "country": "US" },
+      { "id": "adr_chicago", "customer_id": "cust_1", "line1": "900 Lakeshore Dr", "city": "Chicago", "region": "IL", "postal_code": "60601", "country": "US" }
+    ],
+    "payment_methods": [
+      { "id": "pm_visa", "customer_id": "cust_1", "brand": "visa", "last4": "4242", "expiry_month": 8, "expiry_year": 2027 },
+      { "id": "pm_amex", "customer_id": "cust_1", "brand": "amex", "last4": "3782", "expiry_month": 5, "expiry_year": 2029 }
+    ],
+    "plans": [
+      { "id": "plan_4wk", "name": "4 Meals Per Week", "meals_per_week": 4, "servings_per_meal": 2, "currency": "USD", "country": "US", "price_per_serving": 999, "active": true },
+      { "id": "plan_6wk", "name": "6 Meals Per Week", "meals_per_week": 6, "servings_per_meal": 2, "currency": "USD", "country": "US", "price_per_serving": 949, "active": true }
+    ],
+    "meals": [
+      { "id": "meal_salmon", "name": "Grilled Salmon with Asparagus", "steps": ["Roast salmon 15 min", "Serve with asparagus"], "ingredients": ["salmon fillet", "asparagus", "lemon"], "is_active": true },
+      { "id": "meal_chicken", "name": "Herb-Crusted Chicken Breast", "steps": ["Coat with herbs", "Pan-sear"], "ingredients": ["chicken breast", "thyme", "garlic"], "is_active": true },
+      { "id": "meal_tacos", "name": "Black Bean Tacos", "steps": ["Warm tortillas", "Assemble"], "ingredients": ["corn tortillas", "black beans", "avocado"], "is_active": true },
+      { "id": "meal_retired", "name": "Discontinued Holiday Roast", "steps": ["Brine overnight"], "ingredients": ["beef roast", "rosemary"], "is_active": false }
+    ],
+    "subscriptions": [
+      { "id": "sub_1", "customer_id": "cust_1", "status": "active", "plan_id": "plan_4wk", "delivery_day": "monday", "delivery_address_id": "adr_austin", "payment_method_id": "pm_visa", "next_delivery_date": "2026-07-06T00:00:00Z" }
+    ],
+    "orders": [
+      { "id": "ord_1", "subscription_id": "sub_1", "customer_id": "cust_1", "status": "pending", "address_id": "adr_austin", "payment_method_id": "pm_visa", "delivery_date": "2026-07-06T00:00:00Z", "price": 7992, "currency": "USD", "items": [{ "mealId": "meal_salmon", "quantity": 2 }, { "mealId": "meal_chicken", "quantity": 2 }], "carrier": null, "tracking_number": null }
+    ]
+  }
+}

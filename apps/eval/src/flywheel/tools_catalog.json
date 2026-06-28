@@ -1,0 +1,1470 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "health_check",
+      "description": "GET /health (group: health, endpoint: check)",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "customers_list",
+      "description": "GET /customers (group: customers, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "customers_getById",
+      "description": "GET /customers/:customerId (group: customers, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "customers_create",
+      "description": "POST /customers (group: customers, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "email",
+              "firstName",
+              "lastName",
+              "locale",
+              "timezone",
+              "country"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "a string matching the pattern ^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "customers_update",
+      "description": "PATCH /customers/:customerId (group: customers, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "addresses_list",
+      "description": "GET /customers/:customerId/addresses (group: addresses, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "addresses_create",
+      "description": "POST /customers/:customerId/addresses (group: addresses, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "line1",
+              "city",
+              "region",
+              "postalCode",
+              "country"
+            ],
+            "properties": {
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "deliveryNotes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "addresses_update",
+      "description": "PATCH /customers/:customerId/addresses/:addressId (group: addresses, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId",
+              "addressId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "addressId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "deliveryNotes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "addresses_remove",
+      "description": "DELETE /customers/:customerId/addresses/:addressId (group: addresses, endpoint: remove)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId",
+              "addressId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "addressId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "addresses_setDefault",
+      "description": "PUT /customers/:customerId/default-address (group: addresses, endpoint: setDefault)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "addressId"
+            ],
+            "properties": {
+              "addressId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "paymentMethods_list",
+      "description": "GET /customers/:customerId/payment-methods (group: paymentMethods, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "paymentMethods_create",
+      "description": "POST /customers/:customerId/payment-methods (group: paymentMethods, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "brand",
+              "last4",
+              "expiryMonth",
+              "expiryYear"
+            ],
+            "properties": {
+              "brand": {
+                "type": "string",
+                "enum": [
+                  "visa",
+                  "mastercard",
+                  "amex",
+                  "discover"
+                ]
+              },
+              "last4": {
+                "type": "string",
+                "description": "a string matching the pattern ^\\d{4}$",
+                "pattern": "^\\d{4}$"
+              },
+              "expiryMonth": {
+                "type": "integer",
+                "description": "a number between 1 and 12",
+                "title": "between(1, 12)",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "expiryYear": {
+                "type": "integer",
+                "description": "a number between 2000 and 2100",
+                "title": "between(2000, 2100)",
+                "minimum": 2000,
+                "maximum": 2100
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "paymentMethods_remove",
+      "description": "DELETE /customers/:customerId/payment-methods/:paymentMethodId (group: paymentMethods, endpoint: remove)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId",
+              "paymentMethodId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "paymentMethods_setDefault",
+      "description": "PUT /customers/:customerId/default-payment-method (group: paymentMethods, endpoint: setDefault)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "customerId"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "paymentMethodId"
+            ],
+            "properties": {
+              "paymentMethodId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plans_list",
+      "description": "GET /plans (group: plans, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "active": {
+                "$ref": "#/$defs/BooleanFromString"
+              },
+              "country": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "USD",
+                  "EUR",
+                  "GBP",
+                  "CAD",
+                  "AUD"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "BooleanFromString": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ],
+            "description": "a string to be decoded into a boolean"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plans_getById",
+      "description": "GET /plans/:planId (group: plans, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "planId"
+            ],
+            "properties": {
+              "planId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plans_create",
+      "description": "POST /plans (group: plans, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "name",
+              "mealsPerWeek",
+              "servingsPerMeal",
+              "currency",
+              "country",
+              "pricePerServing"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "mealsPerWeek": {
+                "type": "number",
+                "enum": [
+                  2,
+                  4,
+                  6,
+                  8
+                ]
+              },
+              "servingsPerMeal": {
+                "type": "number",
+                "enum": [
+                  2,
+                  4
+                ]
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "USD",
+                  "EUR",
+                  "GBP",
+                  "CAD",
+                  "AUD"
+                ]
+              },
+              "country": {
+                "type": "string"
+              },
+              "pricePerServing": {
+                "type": "integer",
+                "description": "a non-negative number",
+                "title": "nonNegative",
+                "minimum": 0
+              },
+              "active": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "plans_update",
+      "description": "PATCH /plans/:planId (group: plans, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "planId"
+            ],
+            "properties": {
+              "planId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "active": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "meals_list",
+      "description": "GET /meals (group: meals, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "isActive": {
+                "$ref": "#/$defs/BooleanFromString"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "BooleanFromString": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ],
+            "description": "a string to be decoded into a boolean"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "meals_getById",
+      "description": "GET /meals/:mealId (group: meals, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "mealId"
+            ],
+            "properties": {
+              "mealId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "meals_create",
+      "description": "POST /meals (group: meals, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "name",
+              "steps",
+              "ingredients"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "isActive": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "subscriptions_list",
+      "description": "GET /subscriptions (group: subscriptions, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "paused",
+                  "canceled"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "subscriptions_getById",
+      "description": "GET /subscriptions/:subscriptionId (group: subscriptions, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "subscriptionId"
+            ],
+            "properties": {
+              "subscriptionId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "subscriptions_create",
+      "description": "POST /subscriptions (group: subscriptions, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "customerId",
+              "planId",
+              "deliveryDay",
+              "deliveryAddressId",
+              "paymentMethodId",
+              "nextDeliveryDate"
+            ],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "planId": {
+                "type": "string"
+              },
+              "deliveryDay": {
+                "type": "string",
+                "enum": [
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday"
+                ]
+              },
+              "deliveryAddressId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              },
+              "nextDeliveryDate": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "subscriptions_update",
+      "description": "PATCH /subscriptions/:subscriptionId (group: subscriptions, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "subscriptionId"
+            ],
+            "properties": {
+              "subscriptionId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "paused",
+                  "canceled"
+                ]
+              },
+              "planId": {
+                "type": "string"
+              },
+              "deliveryDay": {
+                "type": "string",
+                "enum": [
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday"
+                ]
+              },
+              "deliveryAddressId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              },
+              "nextDeliveryDate": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "orders_list",
+      "description": "GET /orders (group: orders, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "subscriptionId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "shipped",
+                  "delivered",
+                  "canceled"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "orders_getById",
+      "description": "GET /orders/:orderId (group: orders, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "orderId"
+            ],
+            "properties": {
+              "orderId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "orders_create",
+      "description": "POST /orders (group: orders, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "subscriptionId",
+              "addressId",
+              "paymentMethodId",
+              "deliveryDate",
+              "price",
+              "currency",
+              "items"
+            ],
+            "properties": {
+              "subscriptionId": {
+                "type": "string"
+              },
+              "addressId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              },
+              "deliveryDate": {
+                "type": "string"
+              },
+              "price": {
+                "type": "integer",
+                "description": "a non-negative number",
+                "title": "nonNegative",
+                "minimum": 0
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "USD",
+                  "EUR",
+                  "GBP",
+                  "CAD",
+                  "AUD"
+                ]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "mealId",
+                    "quantity"
+                  ],
+                  "properties": {
+                    "mealId": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "$ref": "#/$defs/Int",
+                      "description": "a number greater than or equal to 1",
+                      "title": "greaterThanOrEqualTo(1)",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ],
+        "$defs": {
+          "Int": {
+            "type": "integer",
+            "description": "an integer",
+            "title": "int"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "orders_update",
+      "description": "PATCH /orders/:orderId (group: orders, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "orderId"
+            ],
+            "properties": {
+              "orderId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "shipped",
+                  "delivered",
+                  "canceled"
+                ]
+              },
+              "carrier": {
+                "type": "string",
+                "enum": [
+                  "ups",
+                  "fedex",
+                  "usps",
+                  "dhl"
+                ]
+              },
+              "trackingNumber": {
+                "type": "string"
+              },
+              "addressId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              },
+              "deliveryDate": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "payments_list",
+      "description": "GET /payments (group: payments, endpoint: list)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urlParams": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "customerId": {
+                "type": "string"
+              },
+              "subscriptionId": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "succeeded",
+                  "failed",
+                  "refunded"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "payments_getById",
+      "description": "GET /payments/:paymentId (group: payments, endpoint: getById)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "paymentId"
+            ],
+            "properties": {
+              "paymentId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "payments_create",
+      "description": "POST /payments (group: payments, endpoint: create)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "orderId"
+            ],
+            "properties": {
+              "orderId": {
+                "type": "string"
+              },
+              "paymentMethodId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "payments_update",
+      "description": "PATCH /payments/:paymentId (group: payments, endpoint: update)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "paymentId"
+            ],
+            "properties": {
+              "paymentId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "succeeded",
+                  "failed",
+                  "refunded"
+                ]
+              },
+              "processorRef": {
+                "type": "string"
+              },
+              "failureReason": {
+                "type": "string"
+              },
+              "processedAt": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "payments_refund",
+      "description": "POST /payments/:paymentId/refund (group: payments, endpoint: refund)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "required": [
+              "paymentId"
+            ],
+            "properties": {
+              "paymentId": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "payload"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "time_now",
+      "description": "Get the current date \u2014 year, month, day, and weekday \u2014 from the server clock. Use whenever you need to know what 'today' is (e.g. to compute a nextDeliveryDate or choose a deliveryDay). Defaults to UTC; pass an IANA timezone to get the local date there.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone, e.g. America/New_York. Defaults to UTC."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+]

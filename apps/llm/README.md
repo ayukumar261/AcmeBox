@@ -65,6 +65,38 @@ API_KEY=EMPTY              # vLLM ignores the key by default
 Then run the benchmark as usual (`poetry run acmebox-eval run ...`) and read the
 score.
 
+## 5. Train a LoRA adapter (continual learning)
+
+The flywheel ([`apps/eval/src/flywheel`](../eval/src/flywheel)) mines gold
+transcripts and exports them to JSONL (`acmebox-flywheel export`). `scripts/train.sh`
+fine-tunes a **LoRA adapter** on that data.
+
+**Use a separate, bigger pod.** The serving L4 (23GB) can't train an 8B even with
+QLoRA — spin up an A40/A100-class card for training, keep the L4 serving.
+
+```bash
+# on the TRAINING pod, inside apps/llm/
+bash scripts/setup.sh                       # GPU base (vllm pulls a matching torch)
+cp .env.example .env                         # tune TRAIN_*/LORA_* if needed
+DATASET=/data/sft.jsonl scripts/train.sh     # copy the exported JSONL here first
+# adapter lands in OUTPUT_DIR (default adapters/adapter-<timestamp>)
+```
+
+**What it does** (`train/sft.py`): tokenizes each conversation with LFM2.5's own
+chat template and masks the loss to **assistant tokens only** (the template's
+`{% generation %}` markers), then trains a LoRA adapter and saves it.
+
+- **Attention-only LoRA.** LFM2.5-8B-A1B is `Lfm2MoeForCausalLM`; its MoE experts
+  are fused `nn.Parameter`s (not `nn.Linear`), so PEFT can't adapt them — we target
+  the attention projections `q_proj,k_proj,v_proj,out_proj` (note `out_proj`, **not**
+  `o_proj`). That's the right lever for policy-adherence + tool-call formatting.
+- **Long examples, sparse signal.** Each example runs ~8k tokens (policy + 35-tool
+  catalog) but supervises only ~1% (the assistant turns), so keep
+  `TRAIN_MAX_SEQ_LEN` high (default 16384) and expect to need volume/epochs.
+- **Serving the adapter (Phase 6).** Copy `OUTPUT_DIR` to the serving pod and start
+  vLLM with `--enable-lora --lora-modules <name>=<path>`; point `apps/web`'s
+  `VLLM_MODEL` (and the eval `AGENT_MODEL`) at `<name>`.
+
 ## Notes / gotchas
 
 - **⚠️ Keep this repo and the live pod in sync.** The running RunPod pod is launched

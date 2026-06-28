@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcmeBox Transcript Flywheel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --panel:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --faint:#9ca3af;
+    --hair:#e5e7eb;
+    --hair-strong:#d1d5db;
+    --accent:#7C3AED;
+    --accent-soft:#f3effe;
+    --accent-line:#c4b5fd;
+    --green:#059669;
+    --green-soft:#ecfdf5;
+    --green-line:#a7f3d0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"tnum" 1,"cv02" 1;
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:40px 36px 56px;
+  }
+  /* ---------- header ---------- */
+  .head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;margin-bottom:6px;}
+  .eyebrow{
+    font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 7px;
+  }
+  h1{font-size:21px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--ink);}
+  .sub{font-size:13px;color:var(--muted);margin:6px 0 0;max-width:640px;line-height:1.5;}
+  .loopchip{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11.5px;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);border:1px solid var(--accent-line);
+    border-radius:999px;padding:5px 11px;white-space:nowrap;align-self:flex-start;
+  }
+  .loopchip svg{display:block;}
+
+  /* ---------- diagram canvas ---------- */
+  .canvas{position:relative;margin-top:30px;}
+  .svgwrap{width:100%;}
+  svg.flow{width:100%;height:auto;display:block;overflow:visible;}
+
+  /* card text via foreignObject */
+  .card{
+    width:100%;height:100%;
+    background:var(--panel);
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:13px 14px 14px;
+    display:flex;flex-direction:column;
+    box-shadow:0 1px 1px rgba(17,24,39,.025);
+  }
+  .card .num{
+    font-size:10px;font-weight:700;letter-spacing:.12em;
+    color:var(--accent);text-transform:uppercase;margin-bottom:7px;
+    display:flex;align-items:center;gap:7px;
+  }
+  .card .num .dot{
+    width:18px;height:18px;border-radius:6px;background:var(--accent-soft);
+    border:1px solid var(--accent-line);color:var(--accent);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;
+  }
+  .card h3{font-size:13.5px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em;color:var(--ink);}
+  .card p{font-size:11.5px;line-height:1.42;color:var(--muted);margin:0 0 8px;}
+  .card .tech{
+    margin-top:auto;font-size:10px;line-height:1.35;color:var(--faint);
+    border-top:1px dashed var(--hair);padding-top:7px;
+    font-family:"Inter",ui-monospace,monospace;
+  }
+  .card .tech code{color:var(--accent);font-weight:600;}
+
+  /* gate card variant */
+  .card.gate{border-color:var(--green-line);background:var(--green-soft);}
+  .card.gate .num{color:var(--green);}
+  .card.gate .num .dot{background:#fff;border-color:var(--green-line);color:var(--green);}
+  .card.gate .tech code{color:var(--green);}
+  .card.gate .tech{border-top-color:var(--green-line);}
+
+  /* source chips */
+  .chip{
+    width:100%;height:100%;
+    background:#fbfaff;border:1px solid var(--hair);border-radius:10px;
+    padding:12px 13px;display:flex;flex-direction:column;justify-content:center;
+  }
+  .chip .lab{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
+  .chip .desc{font-size:10.5px;line-height:1.35;color:var(--muted);}
+  .chip .desc code{color:var(--faint);font-size:9.5px;}
+
+  /* legend */
+  .legend{
+    display:flex;gap:22px;flex-wrap:wrap;margin-top:30px;
+    font-size:11px;color:var(--muted);align-items:center;
+  }
+  .legend .item{display:flex;align-items:center;gap:8px;}
+  .legend .swatch{width:22px;height:0;border-top:2px solid var(--accent);border-radius:2px;}
+  .legend .swatch.green{border-top:2px solid var(--green);}
+  .legend .swatch.dash{border-top:2px dashed var(--hair-strong);}
+  .legend b{color:var(--ink);font-weight:600;}
+
+  .roles{
+    margin-top:14px;font-size:10.5px;color:var(--faint);line-height:1.6;
+    border-top:1px solid var(--hair);padding-top:14px;
+  }
+  .roles b{color:var(--muted);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="sr-only">The AcmeBox Transcript Flywheel: a closed self-improvement loop where support-chat transcripts move through grading, teacher correction, batching, and LoRA fine-tuning, then a held-out eval gate promotes the improved agent, which produces new transcripts.</h2>
+
+  <div class="head">
+    <div>
+      <p class="eyebrow">acmebox-flywheel</p>
+      <h1>The AcmeBox Transcript Flywheel</h1>
+      <p class="sub">An autonomous loop that turns support-chat transcripts into LoRA fine-tuning data for the LFM2.5-8B-A1B agent — then trains, gates, and redeploys it. The improved agent produces new transcripts that feed the next turn.</p>
+    </div>
+    <span class="loopchip">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></svg>
+      Closed loop · continuous self-improvement
+    </span>
+  </div>
+
+  <div class="canvas">
+    <div class="svgwrap">
+      <!-- viewBox: 1120 wide. Stage cards on a row y=70..210. Return loop sweeps below. -->
+      <svg class="flow" viewBox="0 0 1120 495" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AcmeBox transcript flywheel pipeline diagram">
+        <defs>
+          <marker id="arrow" markerWidth="9" markerHeight="9" refX="5.8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L7,4 L1,7" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+          <marker id="arrowG" markerWidth="9" markerHeight="9" refX="6.4" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L7,4 L1,7" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+          <marker id="arrowFaint" markerWidth="9" markerHeight="9" refX="6.4" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L7,4 L1,7" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- ===== source chips feeding Conversations ===== -->
+        <foreignObject x="8" y="26" width="150" height="84">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="chip">
+            <div class="lab">Web chats</div>
+            <div class="desc">Real customers ↔ agent in the web app  <code>source: web</code></div>
+          </div>
+        </foreignObject>
+        <foreignObject x="8" y="169" width="150" height="94">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="chip">
+            <div class="lab">Synthetic generated</div>
+            <div class="desc">Author persona → Qwen sim ↔ agent, real tools  <code>source: generated</code></div>
+          </div>
+        </foreignObject>
+
+        <!-- chip connectors into Conversations (x=178 left edge of stage0) -->
+        <path d="M158,68 C168,68 170,118 178,118" fill="none" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#arrowFaint)"/>
+        <path d="M158,216 C168,216 170,166 178,166" fill="none" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#arrowFaint)"/>
+
+        <!-- ===== STAGE CARDS (row) ===== -->
+        <!-- 0 Conversations -->
+        <foreignObject x="180" y="62" width="174" height="198">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+            <div class="num"><span class="dot">0</span>Conversations</div>
+            <h3>Transcripts land</h3>
+            <p>Every chat — real and synthetic — is stored as raw material. Same pipeline, no special-casing.</p>
+            <div class="tech">MongoDB: <code>conversations</code></div>
+          </div>
+        </foreignObject>
+
+        <!-- 1 Grading -->
+        <foreignObject x="372" y="62" width="174" height="198">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+            <div class="num"><span class="dot">1</span>Grading</div>
+            <h3>LLM judge re-grades</h3>
+            <p>Judge scores each transcript on task completion & policy. Violations tagged blocker vs minor.</p>
+            <div class="tech">judge vs <code>policy.md</code> · pass = done + 0 blockers</div>
+          </div>
+        </foreignObject>
+
+        <!-- 2 Correcting -->
+        <foreignObject x="564" y="62" width="174" height="198">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+            <div class="num"><span class="dot">2</span>Correcting</div>
+            <h3>Teacher rewrite</h3>
+            <p>Failed runs rewritten compliant; real tool results spliced back. Kept only if it now passes.</p>
+            <div class="tech">re-verified → MongoDB: <code>training_examples</code></div>
+          </div>
+        </foreignObject>
+
+        <!-- 3 Batching -->
+        <foreignObject x="756" y="62" width="174" height="198">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+            <div class="num"><span class="dot">3</span>Batching</div>
+            <h3>Export to JSONL</h3>
+            <p>Verified gold accrues. Exported with tool catalog + exact serving prompt, so train = inference.</p>
+            <div class="tech">every 20 verified → <code>sft.jsonl</code></div>
+          </div>
+        </foreignObject>
+
+        <!-- 4 SFT with LoRA -->
+        <foreignObject x="948" y="62" width="174" height="198">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card">
+            <div class="num"><span class="dot">4</span>SFT with LoRA</div>
+            <h3>Fine-tune adapter</h3>
+            <p>Background, single-flight. Own chat template, assistant-only loss masking. Outputs a LoRA adapter.</p>
+            <div class="tech">LoRA SFT of <code>LFM2.5-8B-A1B</code> (MoE) · GPU pod</div>
+          </div>
+        </foreignObject>
+
+        <!-- ===== forward arrows between cards (gap x=354->372 etc, 18px gaps) ===== -->
+        <line x1="356" y1="160" x2="370" y2="160" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="548" y1="160" x2="562" y2="160" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="740" y1="160" x2="754" y2="160" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="932" y1="160" x2="946" y2="160" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- ===== RETURN LOOP (green, closes the flywheel) ===== -->
+        <!-- from SFT bottom (x=1035,y=210) sweep down to gate, then back to Conversations bottom (x=267,y=210) -->
+        <!-- down from SFT to gate level -->
+        <path d="M1035,260
+                 C1035,282 1035,300 1035,300"
+              fill="none" stroke="#059669" stroke-width="1.6"/>
+        <!-- into gate (gate card x:760-934 at y=300..420), enter at right edge x=934 y=350 -->
+        <path d="M1035,300 C1035,350 990,350 938,350"
+              fill="none" stroke="#059669" stroke-width="1.6" marker-end="url(#arrowG)"/>
+
+        <!-- GATE / PROMOTE card -->
+        <foreignObject x="760" y="300" width="174" height="172">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="card gate">
+            <div class="num"><span class="dot">5</span>Gate & Promote</div>
+            <h3>Held-out eval</h3>
+            <p>vLLM serves base vs adapter; full eval suite runs twice. Eval set never trained on.</p>
+            <div class="tech">promote iff <code>no regression</code></div>
+          </div>
+        </foreignObject>
+
+        <!-- promoted: gate left edge (x=760,y=360) sweep left + up back into Conversations bottom (x=267,y=210) -->
+        <path d="M760,360
+                 C560,360 300,420 267,420
+                 C150,430 150,365 150,318
+                 C150,272 220,262 267,260"
+              fill="none" stroke="#059669" stroke-width="1.7" marker-end="url(#arrowG)"/>
+
+        <!-- promote label on the return path -->
+        <foreignObject x="300" y="312" width="404" height="26">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Inter,system-ui,sans-serif;font-size:11px;color:#059669;font-weight:600;display:flex;align-items:center;gap:8px;white-space:nowrap;">
+            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#059669;flex:none;"></span>
+            Promoted adapter becomes the serving agent → new conversations
+          </div>
+        </foreignObject>
+      </svg>
+    </div>
+  </div>
+
+  <!-- legend -->
+  <div class="legend">
+    <div class="item"><span class="swatch"></span><span><b>Pipeline</b> generate → judge → correct → train</span></div>
+    <div class="item"><span class="swatch green"></span><span><b>Return path</b> gate & promote, closing the loop</span></div>
+    <div class="item"><span class="swatch dash"></span><span><b>Sources</b> feed Conversations</span></div>
+  </div>
+
+  <div class="roles">
+    <b>Model roles:</b>  agent being improved = <b>LFM2.5-8B-A1B</b> (LiquidAI, MoE)  ·  judge + teacher = strong frontier models  ·  customer / user simulator = <b>Qwen on Together</b>  ·  author = scenario writer.
+  </div>
+</div>
+</body>
+</html>

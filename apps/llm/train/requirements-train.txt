@@ -1,0 +1,10 @@
+# GPU training stack for LoRA SFT (installed on the pod by scripts/train.sh).
+# torch comes from the RunPod PyTorch base image; everything else layers on top.
+# transformers must be recent enough to include Lfm2MoeForCausalLM.
+transformers>=4.55
+peft>=0.13
+datasets>=2.19
+accelerate>=0.34
+jinja2>=3.0
+# Only needed for --load-in-4bit (QLoRA on a smaller card).
+bitsandbytes>=0.43

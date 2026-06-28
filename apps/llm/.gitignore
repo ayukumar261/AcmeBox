@@ -1,6 +1,9 @@
 # secrets / local config
 .env
 
+# trained LoRA adapters (large; produced on the pod by scripts/train.sh)
+/adapters/
+
 # python
 __pycache__/
 *.pyc

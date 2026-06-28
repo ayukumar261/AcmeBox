@@ -1,0 +1,46 @@
+{
+  "id": "delivered_refund",
+  "customerId": "cust_2",
+  "description": "Dana Lee (cust_2): an ACTIVE 6-meals/week subscription and one DELIVERED order (ord_2) paid successfully, with no prior refunds (0 of the 3 lifetime refunds used). Good for: requesting a refund for spoiled/damaged ingredients (allowed), asking about order/delivery status, or a change-of-mind refund (which policy should refuse).",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_2",
+        "email": "dana@example.com",
+        "email_verified": true,
+        "phone_verified": true,
+        "first_name": "Dana",
+        "last_name": "Lee",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "default_address_id": "adr_seattle",
+        "default_payment_method_id": "pm_mc"
+      }
+    ],
+    "addresses": [
+      { "id": "adr_seattle", "customer_id": "cust_2", "line1": "55 Pine St", "city": "Seattle", "region": "WA", "postal_code": "98101", "country": "US" }
+    ],
+    "payment_methods": [
+      { "id": "pm_mc", "customer_id": "cust_2", "brand": "mastercard", "last4": "5555", "expiry_month": 11, "expiry_year": 2028 }
+    ],
+    "plans": [
+      { "id": "plan_6wk", "name": "6 Meals Per Week", "meals_per_week": 6, "servings_per_meal": 2, "currency": "USD", "country": "US", "price_per_serving": 949, "active": true }
+    ],
+    "meals": [
+      { "id": "meal_salmon", "name": "Grilled Salmon with Asparagus", "steps": ["Roast salmon 15 min", "Serve with asparagus"], "ingredients": ["salmon fillet", "asparagus", "lemon"], "is_active": true },
+      { "id": "meal_chicken", "name": "Herb-Crusted Chicken Breast", "steps": ["Coat with herbs", "Pan-sear"], "ingredients": ["chicken breast", "thyme", "garlic"], "is_active": true },
+      { "id": "meal_pasta", "name": "Creamy Mushroom Fettuccine", "steps": ["Cook pasta", "Make sauce", "Toss"], "ingredients": ["fettuccine", "mushrooms", "cream"], "is_active": true },
+      { "id": "meal_retired", "name": "Discontinued Holiday Roast", "steps": ["Brine overnight"], "ingredients": ["beef roast", "rosemary"], "is_active": false }
+    ],
+    "subscriptions": [
+      { "id": "sub_2", "customer_id": "cust_2", "status": "active", "plan_id": "plan_6wk", "delivery_day": "thursday", "delivery_address_id": "adr_seattle", "payment_method_id": "pm_mc", "next_delivery_date": "2026-07-02T00:00:00Z" }
+    ],
+    "orders": [
+      { "id": "ord_2", "subscription_id": "sub_2", "customer_id": "cust_2", "status": "delivered", "address_id": "adr_seattle", "payment_method_id": "pm_mc", "delivery_date": "2026-06-20T00:00:00Z", "price": 11388, "currency": "USD", "items": [{ "mealId": "meal_salmon", "quantity": 3 }, { "mealId": "meal_pasta", "quantity": 3 }], "carrier": "fedex", "tracking_number": "FX1000200030004" }
+    ],
+    "payments": [
+      { "id": "pay_2", "customer_id": "cust_2", "order_id": "ord_2", "subscription_id": "sub_2", "payment_method_id": "pm_mc", "status": "succeeded", "amount": 11388, "currency": "USD", "processor_ref": "ch_dana_1", "processed_at": "2026-06-16T15:04:00Z" }
+    ]
+  }
+}
