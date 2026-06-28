@@ -1,0 +1,91 @@
+{
+  "id": "cancel_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_4",
+        "email": "jordan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Jordan",
+        "last_name": "Lee",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_4"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_4",
+        "customer_id": "cust_4",
+        "line1": "301 Lakeview Dr",
+        "city": "Minneapolis",
+        "region": "MN",
+        "postal_code": "55401",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_4",
+        "customer_id": "cust_4",
+        "brand": "amex",
+        "last4": "0005",
+        "expiry_month": 9,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_4",
+        "customer_id": "cust_4",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "tuesday",
+        "delivery_address_id": "addr_4",
+        "payment_method_id": "pm_4",
+        "next_delivery_date": "2026-07-07T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Jordan Lee, an AcmeBox customer who wants to cancel your meal-kit subscription. You're moving abroad for a year and won't be able to receive deliveries.\n\nBehave like a real customer:\n- Open with your name and the request: you'd like to cancel your subscription.\n- When asked for your customer ID to look up your account, provide it: cust_4.\n- If the agent asks for your subscription ID, provide it: sub_4.\n- If the agent tries to offer a pause or a discount to keep you, politely decline — you specifically want a full cancellation.\n- Once the agent confirms your subscription has been canceled, thank them and you're done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_4",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_4" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_4" },
+          "payload": { "status": "canceled" }
+        }
+      }
+    ]
+  }
+}

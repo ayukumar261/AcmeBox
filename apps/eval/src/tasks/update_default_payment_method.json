@@ -1,0 +1,82 @@
+{
+  "id": "update_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_5",
+        "email": "alex@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Alex",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_address_id": "addr_5",
+        "default_payment_method_id": "pm_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_5",
+        "customer_id": "cust_5",
+        "line1": "18 Broadway",
+        "city": "New York",
+        "region": "NY",
+        "postal_code": "10004",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old",
+        "customer_id": "cust_5",
+        "brand": "visa",
+        "last4": "4321",
+        "expiry_month": 1,
+        "expiry_year": 2027
+      },
+      {
+        "id": "pm_new",
+        "customer_id": "cust_5",
+        "brand": "mastercard",
+        "last4": "8888",
+        "expiry_month": 11,
+        "expiry_year": 2028
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Alex Kim, an AcmeBox customer. You recently added a new Mastercard to your account and you want it set as your default payment method so your next delivery is charged to it instead of your old Visa.\n\nBehave like a real customer:\n- Start by introducing yourself and explaining you want your Mastercard ending in 8888 set as your default payment method.\n- When the agent asks for your customer ID, provide it: cust_5.\n- Let the agent look up your payment methods. When they confirm they can see both your Visa ending in 4321 and your Mastercard ending in 8888, confirm the Mastercard (pm_new) is the one you want as default.\n- Once the agent confirms your Mastercard is now the default, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_5",
+        "expect": { "default_payment_method_id": "pm_new" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_5" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_5" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_5" },
+          "payload": { "paymentMethodId": "pm_new" }
+        }
+      }
+    ]
+  }
+}

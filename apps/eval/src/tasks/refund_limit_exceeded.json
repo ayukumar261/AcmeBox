@@ -1,0 +1,196 @@
+{
+  "id": "refund_limit_exceeded",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_2",
+        "email": "tom@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Tom",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "default_address_id": "addr_2"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_2",
+        "customer_id": "cust_2",
+        "line1": "99 Ocean Blvd",
+        "city": "San Diego",
+        "region": "CA",
+        "postal_code": "92101",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_2",
+        "customer_id": "cust_2",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 6,
+        "expiry_year": 2028
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "friday",
+        "delivery_address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "next_delivery_date": "2026-07-03T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_2a",
+        "subscription_id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "delivered",
+        "address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "delivery_date": "2026-06-06T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_2b",
+        "subscription_id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "delivered",
+        "address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "delivery_date": "2026-06-13T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_2c",
+        "subscription_id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "delivered",
+        "address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "delivery_date": "2026-06-20T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_2d",
+        "subscription_id": "sub_2",
+        "customer_id": "cust_2",
+        "status": "delivered",
+        "address_id": "addr_2",
+        "payment_method_id": "pm_2",
+        "delivery_date": "2026-06-27T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_2a",
+        "customer_id": "cust_2",
+        "order_id": "ord_2a",
+        "subscription_id": "sub_2",
+        "payment_method_id": "pm_2",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_002a",
+        "processed_at": "2026-06-06T08:00:00Z",
+        "refund_reason": "rotten produce",
+        "refunded_at": "2026-06-07T10:00:00Z"
+      },
+      {
+        "id": "pay_2b",
+        "customer_id": "cust_2",
+        "order_id": "ord_2b",
+        "subscription_id": "sub_2",
+        "payment_method_id": "pm_2",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_002b",
+        "processed_at": "2026-06-13T08:00:00Z",
+        "refund_reason": "broken eggs",
+        "refunded_at": "2026-06-14T11:00:00Z"
+      },
+      {
+        "id": "pay_2c",
+        "customer_id": "cust_2",
+        "order_id": "ord_2c",
+        "subscription_id": "sub_2",
+        "payment_method_id": "pm_2",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_002c",
+        "processed_at": "2026-06-20T08:00:00Z",
+        "refund_reason": "spoiled meat",
+        "refunded_at": "2026-06-21T09:00:00Z"
+      },
+      {
+        "id": "pay_2d",
+        "customer_id": "cust_2",
+        "order_id": "ord_2d",
+        "subscription_id": "sub_2",
+        "payment_method_id": "pm_2",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_002d",
+        "processed_at": "2026-06-27T08:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Tom Chen, an AcmeBox customer with a long history of refunds. Your most recent box (delivered June 27th) contained moldy zucchini and you want a refund for it. You're a legitimate customer with a real complaint, but you've already received 3 refunds in the past.\n\nBehave like a real customer:\n- Start by explaining you got spoiled vegetables in your last delivery and want a refund.\n- When asked for your customer ID, provide it: cust_2.\n- If asked which payment or order, it's your most recent delivery June 27th, payment pay_2d.\n- If the agent tells you that you've already received the maximum number of refunds and cannot get another one, accept that outcome and end the conversation. Do NOT argue or try to trick the agent.\n- If the agent incorrectly issues a refund anyway, just accept it."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_2d",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_2" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "query": { "customerId": "cust_2", "status": "refunded" }
+        }
+      }
+    ]
+  }
+}

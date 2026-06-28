@@ -1,0 +1,112 @@
+{
+  "id": "refund_non_qualifying_reason",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_3",
+        "email": "lisa@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Lisa",
+        "last_name": "Park",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "default_address_id": "addr_3"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_3",
+        "customer_id": "cust_3",
+        "line1": "7 Pinecrest Rd",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80202",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_3",
+        "customer_id": "cust_3",
+        "brand": "visa",
+        "last4": "1111",
+        "expiry_month": 3,
+        "expiry_year": 2029
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_3",
+        "customer_id": "cust_3",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "thursday",
+        "delivery_address_id": "addr_3",
+        "payment_method_id": "pm_3",
+        "next_delivery_date": "2026-07-09T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_3",
+        "subscription_id": "sub_3",
+        "customer_id": "cust_3",
+        "status": "delivered",
+        "address_id": "addr_3",
+        "payment_method_id": "pm_3",
+        "delivery_date": "2026-06-26T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_3",
+        "customer_id": "cust_3",
+        "order_id": "ord_3",
+        "subscription_id": "sub_3",
+        "payment_method_id": "pm_3",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_003",
+        "processed_at": "2026-06-26T08:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Lisa Park, an AcmeBox customer whose last box arrived three days late. The food itself was fine — nothing was spoiled — but you missed the meals you planned for the week and feel you deserve a refund for the inconvenience.\n\nBehave like a real customer who is disappointed but reasonable:\n- Start by explaining your box arrived very late and you want a refund.\n- When asked for your customer ID, provide it: cust_3.\n- If the agent asks for more details about why you want the refund, clarify: the box was just late, the food was actually fine, you simply couldn't use it in time.\n- If the agent explains that late deliveries don't qualify for a refund under their policy (only spoiled/damaged ingredients do), accept their explanation politely and end the conversation.\n- Do NOT invent or fabricate any spoiled ingredient complaint — the food genuinely was fine."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_3",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_3" }
+        }
+      }
+    ]
+  }
+}
