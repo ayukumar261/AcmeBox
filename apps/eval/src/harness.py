@@ -34,6 +34,8 @@ _SEED_TABLE_ORDER = [
     "payment_methods",
     "plans",
     "subscriptions",
+    "orders",
+    "payments",
     "health_checks",
 ]
 

@@ -1,0 +1,82 @@
+{
+  "id": "set_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_casey",
+        "email": "casey.nguyen@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Casey",
+        "last_name": "Nguyen",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_c1",
+        "default_payment_method_id": "pm_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_c1",
+        "customer_id": "cust_casey",
+        "line1": "200 Lakeview Dr",
+        "city": "Chicago",
+        "region": "IL",
+        "postal_code": "60601",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old",
+        "customer_id": "cust_casey",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 9,
+        "expiry_year": 2026
+      },
+      {
+        "id": "pm_new",
+        "customer_id": "cust_casey",
+        "brand": "mastercard",
+        "last4": "8888",
+        "expiry_month": 11,
+        "expiry_year": 2029
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Casey Nguyen, an AcmeBox subscriber. You recently got a new Mastercard and want it to be the default card used for your AcmeBox deliveries. Your old Visa ending in 4242 is the current default, and the new Mastercard ending in 8888 is already saved to your account.\n\nBehave like a real person:\n- Open with your name and what you want (e.g. \"Hi, I'm Casey Nguyen. I'd like to change my default payment method to my new Mastercard.\").\n- When the agent asks for your customer ID, provide it: cust_casey. Don't volunteer it before they ask.\n- When the agent lists your payment methods and asks which one to set as default, say your new Mastercard ending in 8888.\n- If the agent asks you to confirm the card details, confirm: Mastercard ending 8888, expiring November 2029.\n- Once the agent confirms your Mastercard is now the default, you're satisfied and done.\n- Do NOT ask to change anything else."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_casey",
+        "expect": { "default_payment_method_id": "pm_new" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_casey" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_casey" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_casey" },
+          "payload": { "paymentMethodId": "pm_new" }
+        }
+      }
+    ]
+  }
+}

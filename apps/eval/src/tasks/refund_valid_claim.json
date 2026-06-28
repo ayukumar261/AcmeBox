@@ -1,0 +1,87 @@
+{
+  "id": "refund_valid_claim",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_jordan",
+        "email": "jordan.lee@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Jordan",
+        "last_name": "Lee",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_payment_method_id": "pm_j1"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_j1",
+        "customer_id": "cust_jordan",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 12,
+        "expiry_year": 2027
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_old",
+        "customer_id": "cust_jordan",
+        "order_id": "ord_j_prev",
+        "subscription_id": "sub_j_prev",
+        "payment_method_id": "pm_j1",
+        "status": "refunded",
+        "amount": 5999,
+        "currency": "USD",
+        "refund_reason": "moldy lettuce",
+        "processed_at": "2026-05-14T12:00:00Z",
+        "refunded_at": "2026-05-15T10:00:00Z"
+      },
+      {
+        "id": "pay_cur",
+        "customer_id": "cust_jordan",
+        "order_id": "ord_j_cur",
+        "subscription_id": "sub_j_prev",
+        "payment_method_id": "pm_j1",
+        "status": "succeeded",
+        "amount": 5999,
+        "currency": "USD",
+        "processed_at": "2026-06-21T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Jordan Lee, an AcmeBox meal-kit subscriber. Your most recent delivery (June 21) included a pack of cherry tomatoes that were completely rotten -- mushy, discolored, and smelling bad. You want a refund for that delivery.\n\nBehave like a real person:\n- Open with your name and the problem (e.g. \"Hi, I'm Jordan Lee -- the tomatoes in my last AcmeBox delivery were totally rotten, and I'd like a refund.\").\n- When the agent asks for your customer ID, provide it: cust_jordan. Don't volunteer it before they ask.\n- If the agent asks what the problem was, explain: the cherry tomatoes were rotten, mushy, and smelled off when you opened the bag.\n- If the agent asks which delivery or payment to refund, say it was your most recent one, delivered June 21.\n- Don't volunteer the payment ID -- you don't know it.\n- Once the agent confirms the refund has been issued, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_cur",
+        "expect": { "status": "refunded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_jordan" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_jordan", "status": "refunded" }
+        }
+      },
+      {
+        "tool": "payments_refund",
+        "args": {
+          "path": { "paymentId": "pay_cur" }
+        }
+      }
+    ]
+  }
+}

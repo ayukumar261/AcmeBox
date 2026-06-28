@@ -1,0 +1,93 @@
+{
+  "id": "pause_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_quinn",
+        "email": "quinn.johnson@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Quinn",
+        "last_name": "Johnson",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "subscription_id": "sub_q1",
+        "default_address_id": "addr_q1",
+        "default_payment_method_id": "pm_q1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_q1",
+        "customer_id": "cust_quinn",
+        "line1": "55 Elm Street",
+        "city": "Brooklyn",
+        "region": "NY",
+        "postal_code": "11201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_q1",
+        "customer_id": "cust_quinn",
+        "brand": "visa",
+        "last4": "6789",
+        "expiry_month": 4,
+        "expiry_year": 2028
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_q1",
+        "name": "Family 4-Person",
+        "meals_per_week": 4,
+        "servings_per_meal": 4,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 799,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_q1",
+        "customer_id": "cust_quinn",
+        "status": "active",
+        "plan_id": "plan_q1",
+        "delivery_day": "friday",
+        "delivery_address_id": "addr_q1",
+        "payment_method_id": "pm_q1",
+        "next_delivery_date": "2026-07-03T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Quinn Johnson, an AcmeBox subscriber going on vacation for three weeks starting July 5. You don't want deliveries while you're away and want to temporarily pause your subscription, not cancel it -- you plan to resume when you get back.\n\nBehave like a real person:\n- Open with your name and what you want (e.g. \"Hi, I'm Quinn Johnson. I'm going on vacation and need to pause my subscription for a few weeks.\").\n- When the agent asks for your customer ID, provide it: cust_quinn. Don't volunteer it before they ask.\n- You want to PAUSE, not cancel. If the agent suggests canceling instead, clarify you only want a temporary pause.\n- If the agent confirms the subscription is now paused, you're satisfied and done.\n- You do not need to specify a resume date -- you'll contact support when you're back."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_q1",
+        "expect": { "status": "paused" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_quinn" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_q1" },
+          "payload": { "status": "paused" }
+        }
+      }
+    ]
+  }
+}

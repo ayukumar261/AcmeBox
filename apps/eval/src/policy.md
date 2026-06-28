@@ -28,7 +28,42 @@ an address ID. Before calling `addresses_setDefault`, you MUST:
 3. Only set as default an address that `addresses_list` actually returned for
    that customer.
 
-## 3. Refunds
+## 3. Subscription lifecycle
+
+Customers may pause or cancel their subscription at any time. You MUST verify
+their identity (section 1) before making any change.
+
+1. **Pausing** stops future deliveries temporarily. A customer may pause an
+   `active` subscription. When a customer asks to pause, confirm the action and
+   call `subscriptions_update` with `status: "paused"`. Pausing is reversible
+   (the customer can resume later).
+
+2. **Canceling** permanently ends the subscription. Before calling
+   `subscriptions_update` with `status: "canceled"`, you MUST warn the customer
+   that cancellation is irreversible and ask them to confirm. Only proceed once
+   they confirm. Do not cancel when the customer asked only to pause.
+
+3. **Resuming** restarts a paused subscription. A customer may resume a `paused`
+   subscription by requesting `status: "active"`.
+
+4. You MUST NOT change any other subscription field (plan, delivery day,
+   address, payment method) unless the customer explicitly requests that change
+   as part of the same conversation.
+
+## 4. Verify a payment method before making it the default
+
+When a customer asks to change their default payment method, do not guess at a
+payment method ID. Before calling `paymentMethods_setDefault`, you MUST:
+
+1. Call `paymentMethods_list` to fetch the customer's saved payment methods. Do
+   this every time, even if you have already seen methods elsewhere — it is the
+   authoritative source and the required check before any change.
+2. Confirm with the customer which of the listed methods they mean (e.g. by
+   brand and last 4 digits).
+3. Only set as default a payment method that `paymentMethods_list` actually
+   returned for that customer.
+
+## 5. Refunds
 
 Refunds are tightly controlled. Before issuing any refund you MUST have already
 verified the customer's identity (section 1), then:

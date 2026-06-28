@@ -1,0 +1,93 @@
+{
+  "id": "cancel_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_riley",
+        "email": "riley.park@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Riley",
+        "last_name": "Park",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "subscription_id": "sub_r1",
+        "default_address_id": "addr_r1",
+        "default_payment_method_id": "pm_r1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_r1",
+        "customer_id": "cust_riley",
+        "line1": "88 Pine St",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80203",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_r1",
+        "customer_id": "cust_riley",
+        "brand": "amex",
+        "last4": "3737",
+        "expiry_month": 6,
+        "expiry_year": 2029
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_r1",
+        "name": "Classic 2-Person",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_r1",
+        "customer_id": "cust_riley",
+        "status": "active",
+        "plan_id": "plan_r1",
+        "delivery_day": "wednesday",
+        "delivery_address_id": "addr_r1",
+        "payment_method_id": "pm_r1",
+        "next_delivery_date": "2026-07-02T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Riley Park, an AcmeBox subscriber who wants to cancel your subscription. Life has gotten busy and you're not cooking at home as much as you used to, so you want to stop the deliveries entirely.\n\nBehave like a real person:\n- Open with your name and what you want (e.g. \"Hi, I'm Riley Park. I'd like to cancel my AcmeBox subscription.\").\n- When the agent asks for your customer ID, provide it: cust_riley.\n- You want a full cancellation, not a pause. If the agent offers to pause instead, politely decline and confirm you want to cancel.\n- If the agent asks you to confirm the cancellation (since it's irreversible), confirm that yes, you want to proceed.\n- Once the agent confirms the subscription is canceled, you're done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_r1",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_riley" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_r1" },
+          "payload": { "status": "canceled" }
+        }
+      }
+    ]
+  }
+}
