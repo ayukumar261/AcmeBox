@@ -11,6 +11,8 @@ import { OrdersLive } from "./modules/orders/handlers.js";
 import { OrdersRepository } from "./modules/orders/repository.js";
 import { PaymentMethodsLive } from "./modules/payment-methods/handlers.js";
 import { PaymentMethodsRepository } from "./modules/payment-methods/repository.js";
+import { PaymentsLive } from "./modules/payments/handlers.js";
+import { PaymentsRepository } from "./modules/payments/repository.js";
 import { PlansLive } from "./modules/plans/handlers.js";
 import { PlansRepository } from "./modules/plans/repository.js";
 import { SubscriptionsLive } from "./modules/subscriptions/handlers.js";
@@ -38,6 +40,7 @@ export const ApiLive = HttpApiBuilder.api(Api).pipe(
   Layer.provide(MealsLive),
   Layer.provide(SubscriptionsLive),
   Layer.provide(OrdersLive),
+  Layer.provide(PaymentsLive),
   Layer.provide(CustomersRepository.Default),
   Layer.provide(AddressesRepository.Default),
   Layer.provide(PaymentMethodsRepository.Default),
@@ -45,4 +48,5 @@ export const ApiLive = HttpApiBuilder.api(Api).pipe(
   Layer.provide(MealsRepository.Default),
   Layer.provide(SubscriptionsRepository.Default),
   Layer.provide(OrdersRepository.Default),
+  Layer.provide(PaymentsRepository.Default),
 );

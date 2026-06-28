@@ -5,6 +5,7 @@ import { CustomersGroup } from "./modules/customers/group.js";
 import { MealsGroup } from "./modules/meals/group.js";
 import { OrdersGroup } from "./modules/orders/group.js";
 import { PaymentMethodsGroup } from "./modules/payment-methods/group.js";
+import { PaymentsGroup } from "./modules/payments/group.js";
 import { PlansGroup } from "./modules/plans/group.js";
 import { SubscriptionsGroup } from "./modules/subscriptions/group.js";
 
@@ -31,4 +32,5 @@ export const Api = HttpApi.make("AcmeBoxApi")
   .add(PlansGroup)
   .add(MealsGroup)
   .add(SubscriptionsGroup)
-  .add(OrdersGroup);
+  .add(OrdersGroup)
+  .add(PaymentsGroup);

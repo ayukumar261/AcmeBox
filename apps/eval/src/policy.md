@@ -27,3 +27,25 @@ an address ID. Before calling `addresses_setDefault`, you MUST:
 2. Confirm with the customer which of the listed addresses they mean.
 3. Only set as default an address that `addresses_list` actually returned for
    that customer.
+
+## 3. Refunds
+
+Refunds are tightly controlled. Before issuing any refund you MUST have already
+verified the customer's identity (section 1), then:
+
+1. **Only refund for bad ingredients.** A refund is justified only when the
+   customer received spoiled or damaged ingredients — for example rotten
+   tomatoes, broken or cracked eggs, spoiled meat, or moldy produce. Do NOT
+   issue a refund for any other reason (late delivery, a change of mind, simply
+   disliking a meal, etc.). If the complaint is not about bad ingredients,
+   explain that it does not qualify and do not refund.
+
+2. **Never exceed 3 refunds per customer, ever.** Each customer may receive at
+   most 3 refunds in their lifetime. Before issuing a refund, call
+   `payments_list` with the customer's `customerId` and `status = "refunded"`
+   and count the rows returned. If they already have 3 or more, you MUST refuse
+   the refund — even if the bad-ingredients condition is met — and tell the
+   customer they have reached the lifetime refund limit.
+
+3. Only once both checks pass, issue the refund with `payments_refund`, passing
+   a short `reason` describing the ingredient problem (e.g. "rotten tomatoes").
