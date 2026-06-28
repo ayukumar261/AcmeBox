@@ -5,7 +5,10 @@ Grading is two pure checks (no model calls):
 1. ``db_check`` -- the source of truth. Read the ephemeral DB after the
    conversation and confirm the expected columns. Catches agents that *say* they
    did something but didn't, and agents that reached the right state the wrong way
-   (e.g. by deleting/recreating instead of updating).
+   (e.g. by deleting/recreating instead of updating). A check locates its row by
+   ``id`` or by a ``where`` column match, and an expected value may be a literal
+   or a ``$ref`` that resolves to another row's value -- so a check can assert a
+   link to a row whose id is only known at runtime (e.g. a just-created address).
 2. ``tools`` -- confirm the required tool(s) were actually called with the
    expected arguments (subset match, including the nested path/payload shape).
 
@@ -63,44 +66,109 @@ def _is_subset(expected: Any, actual: Any) -> bool:
     return expected == actual
 
 
+_REF = "$ref"
+
+
+def _match_clause(match: dict[str, Any]) -> tuple[sql.Composed, list[Any]]:
+    """An AND-equality WHERE clause from a ``{column: value}`` filter.
+
+    Columns are quoted as identifiers and values are bound as parameters (same
+    safe-composition pattern as ``harness._insert_row``).
+    """
+
+    cols = list(match)
+    clause = sql.SQL(" AND ").join(
+        sql.SQL("{} = {}").format(sql.Identifier(c), sql.Placeholder()) for c in cols
+    )
+    return clause, [match[c] for c in cols]
+
+
+def _fetch_one(
+    conn: psycopg.Connection, table: str, match: dict[str, Any]
+) -> tuple[dict | None, str]:
+    """Fetch the single row matching ``match``; zero/ambiguous matches are errors."""
+
+    clause, params = _match_clause(match)
+    rows = conn.execute(
+        sql.SQL("SELECT * FROM {} WHERE {}").format(sql.Identifier(table), clause),
+        params,
+    ).fetchall()
+    if not rows:
+        return None, f"no row matching {match!r}"
+    if len(rows) > 1:
+        return None, f"ambiguous match ({len(rows)} rows) for {match!r}"
+    return rows[0], "ok"
+
+
+def _row_exists(conn: psycopg.Connection, table: str, match: dict[str, Any]) -> bool:
+    """True if any row matches ``match`` -- the basis of an ``absent`` assertion."""
+
+    clause, params = _match_clause(match)
+    found = conn.execute(
+        sql.SQL("SELECT 1 FROM {} WHERE {} LIMIT 1").format(
+            sql.Identifier(table), clause
+        ),
+        params,
+    ).fetchone()
+    return found is not None
+
+
+def _resolve(conn: psycopg.Connection, value: Any) -> tuple[Any, str | None]:
+    """A literal resolves to itself; a ``{"$ref": ...}`` to a referenced column.
+
+    Returns ``(resolved_value, None)`` on success or ``(None, error_detail)`` if
+    a ``$ref`` row couldn't be uniquely located.
+    """
+
+    if isinstance(value, dict) and set(value) == {_REF}:
+        spec = value[_REF]
+        row, detail = _fetch_one(conn, spec["table"], spec["where"])
+        if row is None:
+            return None, f"$ref {spec['table']}: {detail}"
+        return row.get(spec.get("column", "id")), None
+    return value, None
+
+
 def check_db(db_url: str, checks: list[DbCheck]) -> list[CheckResult]:
     results: list[CheckResult] = []
     with psycopg.connect(db_url, row_factory=dict_row) as conn:
         for check in checks:
-            row = conn.execute(
-                sql.SQL("SELECT * FROM {} WHERE id = %s").format(
-                    sql.Identifier(check.table)
-                ),
-                [check.id],
-            ).fetchone()
+            label = check.id if check.id is not None else check.where
+            name = f"db:{check.table}:{label}"
 
-            if row is None:
+            if check.absent:
+                exists = _row_exists(conn, check.table, check.match)
                 results.append(
                     CheckResult(
-                        name=f"db:{check.table}:{check.id}",
-                        passed=False,
-                        detail=f"row id={check.id!r} not found in {check.table}",
+                        name=name,
+                        passed=not exists,
+                        detail="absent"
+                        if not exists
+                        else f"row {check.match!r} still present",
                     )
                 )
                 continue
 
-            mismatches = {
-                col: (exp, row.get(col))
-                for col, exp in check.expect.items()
-                if row.get(col) != exp
-            }
+            row, detail = _fetch_one(conn, check.table, check.match)
+            if row is None:
+                results.append(CheckResult(name=name, passed=False, detail=detail))
+                continue
+
+            mismatches: list[str] = []
+            for col, exp in check.expect.items():
+                expected, ref_err = _resolve(conn, exp)
+                if ref_err:
+                    mismatches.append(f"{col}: {ref_err}")
+                elif row.get(col) != expected:
+                    mismatches.append(
+                        f"{col}: expected {expected!r}, got {row.get(col)!r}"
+                    )
+
             results.append(
                 CheckResult(
-                    name=f"db:{check.table}:{check.id}",
+                    name=name,
                     passed=not mismatches,
-                    detail=(
-                        "ok"
-                        if not mismatches
-                        else "; ".join(
-                            f"{c}: expected {e!r}, got {g!r}"
-                            for c, (e, g) in mismatches.items()
-                        )
-                    ),
+                    detail="ok" if not mismatches else "; ".join(mismatches),
                 )
             )
     return results

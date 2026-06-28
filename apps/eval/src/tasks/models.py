@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 TASKS_DIR = Path(__file__).resolve().parent
 
@@ -20,13 +20,37 @@ TASKS_DIR = Path(__file__).resolve().parent
 class DbCheck(BaseModel):
     """Assert a row's columns after the conversation.
 
-    ``id`` is matched against the table's ``id`` primary key; ``expect`` maps
-    snake_case DB column names to their required values.
+    Locate the row by ``id`` (primary-key shorthand) or ``where`` (match on any
+    columns) -- exactly one is required. By default the row must exist and its
+    ``expect`` columns must match; set ``absent: true`` instead to assert the row
+    does NOT exist (e.g. after a deletion), in which case ``expect`` must be empty.
+    An expected value may be a literal, or a ``{"$ref": {table, where, column?}}``
+    object that resolves to another row's value. The ``$ref`` form lets a check
+    assert a cross-row link whose id isn't known until runtime -- e.g. a
+    customer's ``default_address_id`` pointing at a freshly created address.
     """
 
     table: str
-    id: str
-    expect: dict[str, Any]
+    id: str | None = None
+    where: dict[str, Any] | None = None
+    expect: dict[str, Any] = Field(default_factory=dict)
+    absent: bool = False
+
+    @model_validator(mode="after")
+    def _check_shape(self) -> "DbCheck":
+        if (self.id is None) == (self.where is None):
+            raise ValueError("DbCheck needs exactly one of `id` or `where`")
+        if self.where is not None and not self.where:
+            raise ValueError("DbCheck `where` must not be empty")
+        if self.absent and self.expect:
+            raise ValueError("DbCheck `absent` cannot be combined with `expect`")
+        return self
+
+    @property
+    def match(self) -> dict[str, Any]:
+        """The ``{column: value}`` filter that locates the row."""
+
+        return {"id": self.id} if self.id is not None else dict(self.where or {})
 
 
 class ToolCheck(BaseModel):

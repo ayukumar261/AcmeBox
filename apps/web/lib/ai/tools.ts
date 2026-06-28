@@ -72,6 +72,48 @@ export const acmeboxTools = {
     inputSchema: z.object({}),
   }),
 
+  // ----- Time -----
+  // Local tool (no HTTP call): the model has no inherent sense of "today", so
+  // this gives it the current date when it needs to compute a nextDeliveryDate,
+  // pick a deliveryDay, etc. Like apiTool, execute never throws — an invalid
+  // timezone is returned as data so the model can recover.
+  time_now: tool({
+    description:
+      "Get the current date — year, month, day, and weekday — from the server " +
+      "clock. Use whenever you need to know what 'today' is (e.g. to compute a " +
+      "nextDeliveryDate or choose a deliveryDay). Defaults to UTC; pass an IANA " +
+      "timezone to get the local date there.",
+    inputSchema: z.object({
+      timezone: z
+        .string()
+        .optional()
+        .describe("IANA timezone, e.g. America/New_York. Defaults to UTC."),
+    }),
+    execute: async ({ timezone }) => {
+      const tz = timezone ?? "UTC"
+      try {
+        const parts = new Intl.DateTimeFormat("en-CA", {
+          timeZone: tz,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          weekday: "long",
+        }).formatToParts(new Date())
+        const get = (type: string) => parts.find((p) => p.type === type)?.value ?? ""
+        return {
+          year: Number(get("year")),
+          month: Number(get("month")),
+          day: Number(get("day")),
+          weekday: get("weekday"),
+          date: `${get("year")}-${get("month")}-${get("day")}`, // ISO 8601 (YYYY-MM-DD)
+          timezone: tz,
+        }
+      } catch (err) {
+        return { error: true, detail: err instanceof Error ? err.message : String(err) }
+      }
+    },
+  }),
+
   // ----- Customers -----
   customers_list: apiTool({
     description: "Search customers by email and/or phone (AND-combined).",

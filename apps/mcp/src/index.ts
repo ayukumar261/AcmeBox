@@ -1,5 +1,6 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { deriveTools } from "./deriver.js";
+import { localTools } from "./local.js";
 import { makeRuntime } from "./runtime.js";
 import { makeServer } from "./server.js";
 
@@ -10,11 +11,15 @@ import { makeServer } from "./server.js";
  * keep logging on stderr.
  */
 const main = async (): Promise<void> => {
-  const tools = deriveTools();
+  // Derived (API-backed) tools plus any process-local tools (e.g. `time_now`).
+  const localByName = new Map(localTools.map((l) => [l.tool.name, l]));
+  const tools = [...deriveTools(), ...localTools.map((l) => l.tool)];
   const runtime = await makeRuntime();
-  const server = makeServer(tools, (tool, args) =>
-    runtime.call(tool.group, tool.endpoint, args, tool.parts),
-  );
+  const server = makeServer(tools, (tool, args) => {
+    const local = localByName.get(tool.name);
+    if (local) return Promise.resolve(local.handle(args));
+    return runtime.call(tool.group, tool.endpoint, args, tool.parts);
+  });
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

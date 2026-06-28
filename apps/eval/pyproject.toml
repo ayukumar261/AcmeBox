@@ -28,4 +28,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 markers = [
     "mcp: spawns the MCP server (slower; needs pnpm + Postgres, no API keys)",
+    "db: exercises check_db against an ephemeral DB (needs pnpm + Postgres, no API keys)",
 ]

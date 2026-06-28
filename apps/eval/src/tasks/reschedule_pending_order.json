@@ -1,0 +1,117 @@
+{
+  "id": "reschedule_pending_order",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "pending",
+        "address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-07-06T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": null,
+        "tracking_number": null
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. Your next box hasn't shipped yet and you'll be travelling on the day it's due, so you want to RESCHEDULE that upcoming box to a later date. You want it delivered on 2026-07-13 -- if the agent needs an exact value, the date/time to use is 2026-07-13T00:00:00Z. You do NOT want to change the address, the payment method, or anything else -- just the delivery date.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the request in plain words (e.g. \"Hi, this is Sam Rivera -- can you push my next box to a later date?\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal order ID -- don't make one up. Let the agent pull up your orders and find the upcoming one.\n- When the agent asks what date you want, tell them 2026-07-13 (and give the exact 2026-07-13T00:00:00Z if they ask for a precise timestamp).\n- Keep the same address and card. If the agent offers to change anything else, politely decline.\n- Once the agent confirms the box has been moved to the new date, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "orders",
+        "id": "ord_1",
+        "expect": {
+          "status": "pending",
+          "address_id": "adr_1",
+          "payment_method_id": "pm_1"
+        }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_update",
+        "args": {
+          "path": { "orderId": "ord_1" },
+          "payload": { "deliveryDate": "2026-07-13T00:00:00Z" }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "id": "track_shipped_order",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "shipped",
+        "address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-30T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": "ups",
+        "tracking_number": "1Z999AA10123456784"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. Your box is on the way and you just want to know WHERE IT IS -- the status, the carrier, the tracking number, and when it's expected. You are NOT asking to change, cancel, reschedule, or redirect anything; this is purely a status check.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the question in plain words (e.g. \"Hi, this is Sam Rivera -- where's my box? Do you have a tracking number?\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal order ID -- don't make one up. Let the agent pull up your orders.\n- Just want the details: who's carrying it, the tracking number, and the expected delivery date. Don't ask the agent to make any changes.\n- Once the agent gives you the carrier and tracking info, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "orders",
+        "id": "ord_1",
+        "expect": {
+          "status": "shipped",
+          "carrier": "ups",
+          "tracking_number": "1Z999AA10123456784",
+          "address_id": "adr_1"
+        }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      }
+    ]
+  }
+}

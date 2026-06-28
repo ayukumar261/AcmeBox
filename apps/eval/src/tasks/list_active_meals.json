@@ -1,0 +1,66 @@
+{
+  "id": "list_active_meals",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US"
+      }
+    ],
+    "meals": [
+      {
+        "id": "meal_salmon",
+        "name": "Grilled Salmon with Asparagus",
+        "steps": ["Preheat oven to 400F", "Season salmon with lemon and dill", "Roast 15 minutes", "Serve with asparagus"],
+        "ingredients": ["salmon fillet", "asparagus", "lemon", "dill", "olive oil"],
+        "is_active": true
+      },
+      {
+        "id": "meal_chicken",
+        "name": "Herb-Crusted Chicken Breast",
+        "steps": ["Pound chicken thin", "Coat with herbs", "Pan-sear 6 minutes per side"],
+        "ingredients": ["chicken breast", "thyme", "rosemary", "garlic", "butter"],
+        "is_active": true
+      },
+      {
+        "id": "meal_pasta",
+        "name": "Creamy Mushroom Fettuccine",
+        "steps": ["Cook pasta al dente", "Saute mushrooms", "Make cream sauce", "Toss together"],
+        "ingredients": ["fettuccine", "mushrooms", "cream", "garlic", "parmesan"],
+        "is_active": true
+      },
+      {
+        "id": "meal_tacos",
+        "name": "Black Bean Tacos",
+        "steps": ["Warm tortillas", "Season black beans", "Assemble with toppings"],
+        "ingredients": ["corn tortillas", "black beans", "avocado", "cilantro", "lime"],
+        "is_active": true
+      },
+      {
+        "id": "meal_retired",
+        "name": "Discontinued Holiday Roast",
+        "steps": ["Brine roast overnight", "Roast low and slow"],
+        "ingredients": ["beef roast", "rosemary", "garlic"],
+        "is_active": false
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You want to see all the meals available this week so you can decide what to cook. You are just browsing the menu -- you are NOT changing your plan, your subscription, or anything else on your account.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and what you want in plain words (e.g. \"Hi, this is Sam Rivera -- can you show me all the meals available for the week?\"). Keep each message short and casual.\n- You just want the current menu: the list of meals you can actually pick from right now. Don't ask about retired or discontinued meals.\n- If the agent asks for your customer ID, give it: cust_1. Don't volunteer it before they ask.\n- Let the agent look up the menu and tell you what's available. Don't list any meals yourself or name specific dishes first.\n- If the agent offers to change anything on your account, politely decline -- you only want to see this week's meals.\n- Once the agent has given you the list of available meals, thank them -- you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "tools": [
+      {
+        "tool": "meals_list",
+        "args": { "urlParams": { "isActive": "true" } }
+      }
+    ]
+  }
+}

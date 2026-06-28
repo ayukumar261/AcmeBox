@@ -57,7 +57,17 @@ Drop a JSON file in `src/tasks/`:
   during seed, so order doesn't matter).
 - `user.instructions` — the persona/goal for the simulated customer.
 - `evaluation_criteria.db_check` — expected final column values (the truth).
+  Each check locates one row by `id` (primary-key shorthand) **or** `where` (an
+  AND-equality match on any columns — use this when the row's id is assigned at
+  runtime). `expect` maps snake_case columns to required values. An expected
+  value may be a literal, or a `$ref` that resolves to another row's value:
+  `{"$ref": {"table": ..., "where": {...}, "column": "id"}}` — this lets a check
+  assert a cross-row link, e.g. that a customer's `default_address_id` points at
+  a just-created address. A `where`/`$ref` lookup must match exactly one row. To
+  assert a row was **deleted**, set `"absent": true` (with no `expect`) — the
+  check passes only if no row matches.
 - `evaluation_criteria.tools` — required tool calls (subset-matched, including
   the nested `path`/`payload` shape MCP tools use).
 
-See `tasks/update_default_address.json` for a worked example.
+See `tasks/update_default_address.json` for a worked example, and
+`tasks/add_new_default_address.json` for `where` + `$ref` in action.

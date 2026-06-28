@@ -44,7 +44,15 @@ export const makeServer = (tools: readonly DerivedTool[], dispatch: Dispatch): S
     }
     try {
       const result = await dispatch(tool, request.params.arguments ?? {});
-      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      // A 204/NoContent endpoint resolves to `undefined`, and
+      // `JSON.stringify(undefined)` is the JS value `undefined`, not a string —
+      // which produces an invalid MCP content block. Emit an explicit success
+      // marker so `text` is always a string and the caller sees the call worked.
+      const text =
+        result === undefined || result === null
+          ? "Success (no content)."
+          : JSON.stringify(result, null, 2);
+      return { content: [{ type: "text", text }] };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return { isError: true, content: [{ type: "text", text: message }] };

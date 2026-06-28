@@ -1,0 +1,87 @@
+{
+  "id": "reactivate_canceled_subscription_rejected",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "canceled",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You CANCELED your meal-kit subscription a while ago, and now you've changed your mind and want it back -- you want your old, canceled subscription REACTIVATED and set back to active. You think of it as just flipping it back on.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the request in plain words (e.g. \"Hi, this is Sam Rivera -- I canceled my subscription before but I'd like to turn it back on\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal subscription ID -- don't make one up. Let the agent pull up your subscription.\n- You genuinely want THIS canceled subscription reactivated. If the agent tells you a canceled subscription can't be reactivated, push back once or twice in a normal, polite way (\"Are you sure? Can't you just switch it back on?\") -- you really would like it back.\n- If the agent explains the canceled subscription can't be changed and that you'd need to start a brand-new subscription instead, accept that answer and wrap up. Do not insist forever.\n- Do not be satisfied by, or thank the agent for, any claim that the old subscription is active again -- that should not be possible."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      }
+    ]
+  }
+}

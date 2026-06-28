@@ -1,0 +1,70 @@
+{
+  "id": "change_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_payment_method_id": "pm_old"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      },
+      {
+        "id": "pm_new",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 11,
+        "expiry_year": 2028
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have two cards saved on your account: a Visa (your current default) and a Mastercard. You want your Mastercard set as your DEFAULT payment method going forward. The Mastercard is ALREADY on file -- you are NOT adding a new card, you just want to switch your default to a card you already have. You do NOT want to change anything else about your account.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the problem in plain words (e.g. \"Hi, this is Sam Rivera -- can you switch my default card to my Mastercard?\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- Refer to the card you want the way a person would: \"my Mastercard, the one ending in 5555.\" You do NOT know any internal payment ID -- don't make one up. Let the agent pull up your cards and find the right one.\n- Make it clear this card is ALREADY on your account. If the agent asks you for a new card number or offers to add a new card, decline -- you only want to switch to the Mastercard you already have on file.\n- Let the agent do the work of looking up your account and your saved cards. Don't hand it everything in the first message.\n- If the agent offers to change anything else, politely decline -- just the default payment method.\n- Once the agent confirms your Mastercard is now your default payment method, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_payment_method_id": "pm_new" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "paymentMethodId": "pm_new" }
+        }
+      }
+    ]
+  }
+}

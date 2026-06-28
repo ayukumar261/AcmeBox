@@ -1,0 +1,98 @@
+{
+  "id": "add_new_default_address",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_old",
+        "customer_id": "cust_1",
+        "line1": "1 Old St",
+        "city": "Boston",
+        "region": "MA",
+        "postal_code": "02101",
+        "country": "US"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You recently moved to Austin, but your new Austin address is NOT on file yet -- the only address AcmeBox has for you is your old Boston place, which is your current default. You want to add your new Austin address and set it as your DEFAULT going forward, while keeping the Boston address on file. You do NOT want to change anything else about your account.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the problem in plain words (e.g. \"Hi, this is Sam Rivera -- I just moved and I need to add a new address and make it my default for shipping.\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- Make it clear this is a BRAND-NEW address that isn't on your account yet -- they'll need to add it, not pick from whatever is already there.\n- When the agent asks for the new address, give it to them: 500 New Ave, Austin, TX 73301, US. Don't recite the full address until they ask; if they read the details back to confirm, confirm them.\n- If the agent asks about your old Boston address, tell them to keep it on file -- you just want the Austin one added and set as the new default.\n- Let the agent do the work of pulling up your account and adding the address. Don't hand it everything in the first message.\n- If the agent offers to change anything else, politely decline -- just add the new address and make it your default.\n- Once the agent confirms your Austin address has been added and is now your default, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "addresses",
+        "id": "addr_old",
+        "expect": {
+          "line1": "1 Old St",
+          "city": "Boston",
+          "region": "MA",
+          "postal_code": "02101",
+          "country": "US"
+        }
+      },
+      {
+        "table": "addresses",
+        "where": { "customer_id": "cust_1", "line1": "500 New Ave" },
+        "expect": {
+          "city": "Austin",
+          "region": "TX",
+          "postal_code": "73301",
+          "country": "US"
+        }
+      },
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": {
+          "default_address_id": {
+            "$ref": {
+              "table": "addresses",
+              "where": { "customer_id": "cust_1", "line1": "500 New Ave" },
+              "column": "id"
+            }
+          }
+        }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "addresses_create",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": {
+            "line1": "500 New Ave",
+            "city": "Austin",
+            "region": "TX",
+            "postalCode": "73301",
+            "country": "US"
+          }
+        }
+      },
+      {
+        "tool": "addresses_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      }
+    ]
+  }
+}

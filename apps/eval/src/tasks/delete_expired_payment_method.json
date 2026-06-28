@@ -1,0 +1,83 @@
+{
+  "id": "delete_expired_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_payment_method_id": "pm_valid"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_valid",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 11,
+        "expiry_year": 2028
+      },
+      {
+        "id": "pm_expired",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 3,
+        "expiry_year": 2023
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have two cards saved on your account and you think one of them has expired. You want the EXPIRED card removed from your account, but you are NOT sure which one it is -- you want the agent to check and delete whichever card is past its expiry date. You want to KEEP the card that is still valid. You do NOT want to change anything else, and you are NOT adding a new card.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the problem in plain words (e.g. \"Hi, this is Sam Rivera -- I think one of my cards expired, can you remove the expired one?\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- Do NOT tell the agent which card is expired or read out expiry dates -- you genuinely don't remember. If they ask which one, say you're not sure and that's why you're asking; ask them to check and remove whichever card is past its expiry date.\n- Let the agent look up your cards and figure out which is expired. Don't hand it everything in the first message.\n- Keep the card that is still valid. If the agent offers to add a new card or change anything else, politely decline -- you only want the expired card removed.\n- Once the agent confirms the expired card has been removed, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payment_methods",
+        "id": "pm_expired",
+        "absent": true
+      },
+      {
+        "table": "payment_methods",
+        "id": "pm_valid",
+        "expect": { "brand": "mastercard", "last4": "5555" }
+      },
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_payment_method_id": "pm_valid" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "time_now",
+        "args": {}
+      },
+      {
+        "tool": "paymentMethods_remove",
+        "args": {
+          "path": { "customerId": "cust_1", "paymentMethodId": "pm_expired" }
+        }
+      }
+    ]
+  }
+}

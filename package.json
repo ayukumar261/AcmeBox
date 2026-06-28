@@ -8,6 +8,7 @@
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @repo/api db:migrate",
+    "db:seed": "pnpm --filter @repo/api db:seed",
     "db:reset": "docker compose down -v && docker compose up -d --wait && pnpm db:migrate",
     "db:ui": "docker compose up -d --wait pgweb && open http://localhost:${PGWEB_PORT:-8085}",
     "lint": "turbo run lint",

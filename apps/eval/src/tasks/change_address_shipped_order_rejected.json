@@ -1,0 +1,116 @@
+{
+  "id": "change_address_shipped_order_rejected",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_home",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_home",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      },
+      {
+        "id": "adr_work",
+        "customer_id": "cust_1",
+        "line1": "500 Congress Ave",
+        "line2": "Suite 200",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "78701",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_home",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "shipped",
+        "address_id": "adr_home",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-30T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": "ups",
+        "tracking_number": "1Z999AA10123456784"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You want your latest box redirected to your WORK address instead of your home address because your plans changed. In reality that box has already shipped and is in transit, but you don't think about that -- in your head you should just be able to change where it's going. You have two addresses on file (your home on Main St and your work address on Congress Ave).\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the request in plain words (e.g. \"Hi, this is Sam Rivera -- can you redirect my latest box to my work address?\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal order ID or address ID -- don't make one up. Let the agent pull up your orders.\n- If the agent tells you the box has already shipped and its address can't be changed, push back once in a normal, polite way (\"Are you sure there's no way to reroute it?\").\n- If the agent explains that a box that's already shipped can't have its address changed, accept that answer and wrap up. Do not insist forever.\n- Do not be satisfied by, or thank the agent for, any claim that the address was changed -- that should not be possible once the box has shipped."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "orders",
+        "id": "ord_1",
+        "expect": { "status": "shipped", "address_id": "adr_home" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      }
+    ]
+  }
+}

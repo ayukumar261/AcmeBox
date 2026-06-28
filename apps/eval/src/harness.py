@@ -21,19 +21,24 @@ from urllib.parse import urlsplit, urlunsplit
 
 import psycopg
 from psycopg import sql
+from psycopg.types.json import Jsonb
 
 from .config import HarnessConfig
 
 # Tables are seeded in this order so plain INSERTs satisfy FKs where possible.
 # customers <-> addresses is a *circular* FK (customers.default_address_id and
 # addresses.customer_id), so seeding runs with FK triggers disabled regardless
-# (see ``seed``); this ordering just keeps things tidy and deterministic.
+# (see ``seed``); this ordering just keeps things tidy and deterministic. Mirrors
+# the app seed's order (apps/api/src/db/seed/run.ts): parents before children.
 _SEED_TABLE_ORDER = [
     "customers",
     "addresses",
     "payment_methods",
     "plans",
     "subscriptions",
+    "meals",
+    "orders",
+    "payments",
     "health_checks",
 ]
 
@@ -102,6 +107,23 @@ def seed(db_url: str, data: Mapping[str, Sequence[Mapping[str, Any]]]) -> None:
             conn.execute("SET session_replication_role = DEFAULT")
 
 
+def _adapt(value: Any) -> Any:
+    """Coerce a seed value into something psycopg can bind.
+
+    A ``jsonb`` column (the only one in the schema is ``orders.items``) arrives
+    from the task JSON as a dict or a list-of-dicts, which psycopg can't adapt on
+    its own — wrap those in ``Jsonb`` so they serialize as JSON. A list of scalars
+    (the ``text[]`` columns ``meals.steps`` / ``meals.ingredients``) is left alone,
+    since psycopg already maps it to a Postgres array.
+    """
+
+    if isinstance(value, dict):
+        return Jsonb(value)
+    if isinstance(value, list) and any(isinstance(item, dict) for item in value):
+        return Jsonb(value)
+    return value
+
+
 def _insert_row(
     conn: psycopg.Connection, table: str, row: Mapping[str, Any]
 ) -> None:
@@ -111,7 +133,7 @@ def _insert_row(
         cols=sql.SQL(", ").join(sql.Identifier(c) for c in columns),
         vals=sql.SQL(", ").join(sql.Placeholder() for _ in columns),
     )
-    conn.execute(stmt, [row[c] for c in columns])
+    conn.execute(stmt, [_adapt(row[c]) for c in columns])
 
 
 @contextmanager
