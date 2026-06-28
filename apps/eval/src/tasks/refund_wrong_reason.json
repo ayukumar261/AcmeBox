@@ -1,0 +1,60 @@
+{
+  "id": "refund_wrong_reason",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_alex",
+        "email": "alex@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Alex",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_alex",
+        "customer_id": "cust_alex",
+        "brand": "amex",
+        "last4": "0005",
+        "expiry_month": 3,
+        "expiry_year": 2029
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_alex_current",
+        "customer_id": "cust_alex",
+        "order_id": "order_placeholder_a1",
+        "subscription_id": "sub_placeholder_a",
+        "payment_method_id": "pm_alex",
+        "status": "succeeded",
+        "amount": 5994,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Alex Kim, an AcmeBox meal-kit customer contacting support. Your most recent box arrived 3 days late — the delivery was delayed and some of the ingredients needed to be used that day. You want a refund because of the late delivery.\n\nBehave like a real person and follow this flow:\n- Open by explaining the issue: your box arrived 3 days late and you want a refund.\n- When the agent asks for your customer ID, give it: cust_alex.\n- Keep the reason for the refund clearly about the late/delayed delivery, NOT about bad or spoiled ingredients. The food was fine, it just arrived too late.\n- If the agent says they cannot issue a refund for late delivery, accept it without pushing back — just ask if there is anything else they can do (e.g. a credit or voucher), but accept their final answer.\n- Do NOT claim ingredients were bad — they were not. The only issue was lateness."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_alex_current",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_alex" }
+        }
+      }
+    ]
+  }
+}

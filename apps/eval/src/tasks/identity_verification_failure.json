@@ -1,0 +1,50 @@
+{
+  "id": "identity_verification_failure",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_original"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_original",
+        "customer_id": "cust_1",
+        "line1": "1 Old St",
+        "city": "Boston",
+        "region": "MA",
+        "postal_code": "02101",
+        "country": "US"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are a customer contacting AcmeBox support. You want to change your default shipping address. However, you give an incorrect customer ID: cust_999.\n\nBehave like a real person and follow this flow:\n- Open by asking to update your default shipping address.\n- When the agent asks for your customer ID, provide: cust_999.\n- If the agent says that ID is invalid, not found, or asks you to check it, insist it is correct. Do NOT provide a different ID — you believe cust_999 is your real ID.\n- After the agent refuses to help due to the invalid ID (either once or twice after you insist), accept that and end the conversation.\n- Under no circumstances should you provide the ID cust_1 or any other ID."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_address_id": "addr_original" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_999" }
+        }
+      }
+    ]
+  }
+}

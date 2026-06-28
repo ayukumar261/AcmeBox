@@ -1,0 +1,91 @@
+{
+  "id": "cancel_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_taylor",
+        "email": "taylor@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Taylor",
+        "last_name": "Morgan",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "subscription_id": "sub_taylor"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_taylor",
+        "customer_id": "cust_taylor",
+        "line1": "42 Elm Street",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_taylor",
+        "customer_id": "cust_taylor",
+        "brand": "visa",
+        "last4": "7777",
+        "expiry_month": 4,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_standard",
+        "name": "Standard Box",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 1099,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_taylor",
+        "customer_id": "cust_taylor",
+        "status": "active",
+        "plan_id": "plan_standard",
+        "delivery_day": "wednesday",
+        "delivery_address_id": "addr_taylor",
+        "payment_method_id": "pm_taylor",
+        "next_delivery_date": "2026-07-09T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Taylor Morgan, an AcmeBox meal-kit customer contacting support. You've decided you want to cancel your subscription — you're moving and cooking less these days.\n\nBehave like a real person and follow this flow:\n- Open by saying you'd like to cancel your meal kit subscription.\n- When the agent asks for your customer ID, give it: cust_taylor. Don't volunteer it first.\n- If the agent asks why you want to cancel or tries to retain you with offers (like pausing instead), politely but firmly confirm you want to cancel entirely, not pause.\n- Once the agent confirms the subscription has been canceled, you're satisfied and done.\n- Keep messages short and casual."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_taylor",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_taylor" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_taylor" },
+          "payload": { "status": "canceled" }
+        }
+      }
+    ]
+  }
+}

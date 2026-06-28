@@ -1,0 +1,99 @@
+{
+  "id": "refund_at_limit",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_riley",
+        "email": "riley@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Riley",
+        "last_name": "Park",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_riley",
+        "customer_id": "cust_riley",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_refund_1",
+        "customer_id": "cust_riley",
+        "order_id": "order_placeholder_r1",
+        "subscription_id": "sub_placeholder_r",
+        "payment_method_id": "pm_riley",
+        "status": "refunded",
+        "amount": 7992,
+        "currency": "USD",
+        "refund_reason": "moldy produce"
+      },
+      {
+        "id": "pay_refund_2",
+        "customer_id": "cust_riley",
+        "order_id": "order_placeholder_r2",
+        "subscription_id": "sub_placeholder_r",
+        "payment_method_id": "pm_riley",
+        "status": "refunded",
+        "amount": 7992,
+        "currency": "USD",
+        "refund_reason": "cracked eggs"
+      },
+      {
+        "id": "pay_refund_3",
+        "customer_id": "cust_riley",
+        "order_id": "order_placeholder_r3",
+        "subscription_id": "sub_placeholder_r",
+        "payment_method_id": "pm_riley",
+        "status": "refunded",
+        "amount": 7992,
+        "currency": "USD",
+        "refund_reason": "spoiled meat"
+      },
+      {
+        "id": "pay_current_r",
+        "customer_id": "cust_riley",
+        "order_id": "order_placeholder_r4",
+        "subscription_id": "sub_placeholder_r",
+        "payment_method_id": "pm_riley",
+        "status": "succeeded",
+        "amount": 7992,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Riley Park, an AcmeBox meal-kit customer contacting support. This week's box had cracked and broken eggs inside — several were shattered in the packaging. You want a refund.\n\nBehave like a real person and follow this flow:\n- Open by describing the problem: cracked eggs in this week's box, asking for a refund.\n- When the agent asks for your customer ID, provide it: cust_riley.\n- When the agent asks about the problem, explain the eggs were cracked and unusable.\n- If the agent refuses the refund and says you have reached the lifetime refund limit, accept their explanation and end the conversation politely — do NOT argue or push back.\n- If the agent somehow does process a refund, thank them and end the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_current_r",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_riley" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_riley", "status": "refunded" }
+        }
+      }
+    ]
+  }
+}

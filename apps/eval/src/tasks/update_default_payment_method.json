@@ -1,0 +1,70 @@
+{
+  "id": "update_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_maria",
+        "email": "maria@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Maria",
+        "last_name": "Santos",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_payment_method_id": "pm_old_card"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old_card",
+        "customer_id": "cust_maria",
+        "brand": "mastercard",
+        "last4": "1234",
+        "expiry_month": 6,
+        "expiry_year": 2025
+      },
+      {
+        "id": "pm_new_card",
+        "customer_id": "cust_maria",
+        "brand": "visa",
+        "last4": "9999",
+        "expiry_month": 11,
+        "expiry_year": 2030
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Maria Santos, an AcmeBox meal-kit customer contacting support. Your Mastercard ending in 1234 is expiring soon and you want to switch your default payment method to your Visa card ending in 9999.\n\nBehave like a real person and follow this flow:\n- Open by explaining you want to update your default payment method to your Visa card.\n- When the agent asks for your customer ID, give it: cust_maria. Don't volunteer it before they ask.\n- When the agent asks which card you want as the new default, say your Visa ending in 9999.\n- If the agent asks you to confirm which card you mean, confirm: it is the Visa card ending in 9999, expiring 11/2030.\n- Let the agent do the work. Don't hand them all the card details upfront.\n- Once the agent confirms the Visa card is now your default payment method, you're done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_maria",
+        "expect": { "default_payment_method_id": "pm_new_card" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_maria" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_maria" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_maria" },
+          "payload": { "paymentMethodId": "pm_new_card" }
+        }
+      }
+    ]
+  }
+}

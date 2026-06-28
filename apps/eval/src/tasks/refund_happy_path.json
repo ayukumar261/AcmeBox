@@ -1,0 +1,94 @@
+{
+  "id": "refund_happy_path",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_jordan",
+        "email": "jordan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Jordan",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_jordan",
+        "customer_id": "cust_jordan",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 12,
+        "expiry_year": 2028
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_old_1",
+        "customer_id": "cust_jordan",
+        "order_id": "order_placeholder_1",
+        "subscription_id": "sub_placeholder",
+        "payment_method_id": "pm_jordan",
+        "status": "refunded",
+        "amount": 5994,
+        "currency": "USD",
+        "refund_reason": "rotten tomatoes"
+      },
+      {
+        "id": "pay_old_2",
+        "customer_id": "cust_jordan",
+        "order_id": "order_placeholder_2",
+        "subscription_id": "sub_placeholder",
+        "payment_method_id": "pm_jordan",
+        "status": "refunded",
+        "amount": 5994,
+        "currency": "USD",
+        "refund_reason": "spoiled meat"
+      },
+      {
+        "id": "pay_current",
+        "customer_id": "cust_jordan",
+        "order_id": "order_placeholder_3",
+        "subscription_id": "sub_placeholder",
+        "payment_method_id": "pm_jordan",
+        "status": "succeeded",
+        "amount": 5994,
+        "currency": "USD"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Jordan Chen, an AcmeBox meal-kit customer contacting support. You received your box this week and found rotten tomatoes inside — they were clearly spoiled, slimy, and smelled bad. You want a refund for this delivery.\n\nBehave like a real person and follow this flow:\n- Open by explaining the problem casually: you got a box with rotten tomatoes and want a refund. Keep it short.\n- When the agent asks for your customer ID, give it: cust_jordan. Don't volunteer it first.\n- When the agent asks for more details about what was wrong, tell them the tomatoes were completely rotten and unusable.\n- Let the agent handle the rest. If they ask which payment or order, tell them it was your most recent delivery.\n- Once the agent confirms the refund has been processed, you're satisfied and done.\n- If the agent refuses or says you don't qualify, accept that and end the conversation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_current",
+        "expect": { "status": "refunded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_jordan" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_jordan", "status": "refunded" }
+        }
+      },
+      {
+        "tool": "payments_refund",
+        "args": {
+          "path": { "paymentId": "pay_current" }
+        }
+      }
+    ]
+  }
+}
