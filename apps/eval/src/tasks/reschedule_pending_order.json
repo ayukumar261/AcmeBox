@@ -1,0 +1,116 @@
+{
+  "id": "reschedule_pending_order",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "taylor@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Taylor",
+        "last_name": "Brooks",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1",
+        "subscription_id": "sub_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "42 River Rd",
+        "city": "Brooklyn",
+        "region": "NY",
+        "postal_code": "11201",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "3333",
+        "expiry_month": 1,
+        "expiry_year": 2030
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Meal",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "meals": [
+      {
+        "id": "meal_1",
+        "name": "Mushroom Risotto",
+        "steps": ["Sauté mushrooms", "Add arborio rice", "Ladle in broth gradually"],
+        "ingredients": ["arborio rice", "cremini mushrooms", "parmesan", "white wine"],
+        "is_active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "saturday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-12T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "pending",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-07-05T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Taylor Brooks, an AcmeBox customer. Your next box is scheduled to arrive July 5th, but you'll be traveling that week and won't be home. You'd like to push the delivery back to July 12th instead.\n\nBehave like a real customer and follow this flow:\n- Open by saying your name and that you'd like to reschedule your upcoming delivery — you'll be away July 5th.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it first.\n- If the agent asks when you'd like it rescheduled to, say July 12th.\n- Let the agent look up your order and handle the update. You do not need to know the order ID.\n- Once the agent confirms the delivery has been rescheduled to July 12th, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "orders_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "orders_update",
+        "args": {
+          "path": { "orderId": "ord_1" }
+        }
+      }
+    ]
+  },
+  "policy": "When a customer asks to reschedule a delivery, only pending orders can have their delivery date changed. If the order is already shipped or delivered, inform the customer that rescheduling is no longer possible. Always look up the customer's orders with orders_list before attempting any update."
+}

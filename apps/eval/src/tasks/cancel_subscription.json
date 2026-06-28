@@ -1,0 +1,99 @@
+{
+  "id": "cancel_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "alex@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Alex",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1",
+        "subscription_id": "sub_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "55 Park Ave",
+        "city": "New York",
+        "region": "NY",
+        "postal_code": "10016",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "1111",
+        "expiry_month": 6,
+        "expiry_year": 2026
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Meal",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "tuesday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-07T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Alex Kim, an AcmeBox customer who wants to cancel your meal-kit subscription. You're moving abroad next month and simply won't need it anymore.\n\nBehave like a real customer and follow this flow:\n- Open by saying your name and that you'd like to cancel your subscription.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it first.\n- If the agent asks why, keep it brief: you're moving abroad and won't need it.\n- Let the agent pull up your account and handle the cancellation. You do not need to know your subscription ID.\n- If the agent asks you to confirm you want to cancel (and that it's permanent), confirm yes.\n- Once the agent confirms the subscription is cancelled, thank them and end the conversation.\n- If the agent offers to pause instead of cancel, politely decline and insist on cancellation."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "canceled" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "status": "canceled" }
+        }
+      }
+    ]
+  }
+}

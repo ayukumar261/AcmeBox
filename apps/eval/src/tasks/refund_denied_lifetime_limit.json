@@ -1,0 +1,207 @@
+{
+  "id": "refund_denied_lifetime_limit",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "dana@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Dana",
+        "last_name": "Patel",
+        "locale": "en-US",
+        "timezone": "America/Phoenix",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1",
+        "subscription_id": "sub_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "10 Desert Cactus Ln",
+        "city": "Phoenix",
+        "region": "AZ",
+        "postal_code": "85001",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "discover",
+        "last4": "6011",
+        "expiry_month": 7,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Meal",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "meals": [
+      {
+        "id": "meal_1",
+        "name": "Beef Tacos",
+        "steps": ["Brown beef", "Warm tortillas", "Assemble"],
+        "ingredients": ["ground beef", "tortillas", "salsa", "cheese"],
+        "is_active": true
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_past_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-04-07T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_past_2",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-05-12T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_past_3",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-02T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      },
+      {
+        "id": "ord_current",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-23T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_past_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_past_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_r1",
+        "processed_at": "2026-04-07T10:00:00Z",
+        "refund_reason": "moldy produce",
+        "refunded_at": "2026-04-08T12:00:00Z"
+      },
+      {
+        "id": "pay_past_2",
+        "customer_id": "cust_1",
+        "order_id": "ord_past_2",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_r2",
+        "processed_at": "2026-05-12T10:00:00Z",
+        "refund_reason": "broken eggs",
+        "refunded_at": "2026-05-13T09:00:00Z"
+      },
+      {
+        "id": "pay_past_3",
+        "customer_id": "cust_1",
+        "order_id": "ord_past_3",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "refunded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_r3",
+        "processed_at": "2026-06-02T10:00:00Z",
+        "refund_reason": "spoiled meat",
+        "refunded_at": "2026-06-03T11:00:00Z"
+      },
+      {
+        "id": "pay_current",
+        "customer_id": "cust_1",
+        "order_id": "ord_current",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_c1",
+        "processed_at": "2026-06-23T10:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Dana Patel, an AcmeBox customer. Your most recent delivery (June 23) had rotten tomatoes in it — a genuine bad-ingredient complaint. You want a refund.\n\nBehave like a real customer and follow this flow:\n- Open by saying your name and that you'd like a refund for your last delivery — the tomatoes were completely rotten.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it first.\n- Describe the problem honestly if asked: the tomatoes were soft, black, and smelled off when you opened the box.\n- Let the agent look up your account and make the determination. You do not know about your refund history.\n- If the agent tells you that you've already received the maximum number of refunds and cannot issue another one, accept the explanation politely and end the conversation.\n- Do not argue or try to bypass the policy."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_current",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1", "status": "refunded" }
+        }
+      }
+    ]
+  }
+}

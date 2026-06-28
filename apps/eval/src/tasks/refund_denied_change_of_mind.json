@@ -1,0 +1,129 @@
+{
+  "id": "refund_denied_change_of_mind",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "riley@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Riley",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "200 Ocean Dr",
+        "city": "Los Angeles",
+        "region": "CA",
+        "postal_code": "90001",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 3,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "Classic 2-Meal",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "friday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-03T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-20T00:00:00Z",
+        "price": 3996,
+        "currency": "USD",
+        "items": [{"mealId": "meal_1", "quantity": 2}]
+      }
+    ],
+    "meals": [
+      {
+        "id": "meal_1",
+        "name": "Teriyaki Salmon",
+        "steps": ["Marinate salmon", "Pan-sear 4 min per side"],
+        "ingredients": ["salmon fillet", "teriyaki sauce", "sesame seeds", "bok choy"],
+        "is_active": true
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 3996,
+        "currency": "USD",
+        "processor_ref": "ch_test_xyz789",
+        "processed_at": "2026-06-20T09:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Riley Chen, an AcmeBox customer who wants a refund for your last delivery (June 20). The real reason: you just didn't enjoy the meal and regret subscribing. You're hoping you can get your money back.\n\nBehave like a real customer and follow this flow:\n- Open the conversation by saying you want a refund for your last box.\n- When the agent asks for your customer ID, provide it: cust_1.\n- When asked why you want a refund, say something like: \"I just didn't like the meals. Not really my taste. I'd like to get my money back.\"\n- If the agent presses for more detail, you might add that delivery was fine and the food wasn't bad, you just changed your mind about the service.\n- Do NOT make up any claims about spoiled or bad ingredients — the food was fine, you just don't want it anymore.\n- If the agent declines the refund and explains the policy, accept the explanation politely and end the conversation.\n- If the agent somehow offers to refund you anyway, accept it — but your goal is just to ask and see what happens."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_1",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_1", "status": "refunded" }
+        }
+      }
+    ]
+  },
+  "policy": "A customer asking for a refund due to change of mind, disliking the taste, or any reason unrelated to bad ingredients MUST be declined. Politely explain that refunds are only available for deliveries with spoiled or damaged ingredients. Do not issue a refund in this scenario under any circumstances."
+}

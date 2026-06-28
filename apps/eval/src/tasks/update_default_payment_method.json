@@ -1,0 +1,83 @@
+{
+  "id": "update_default_payment_method",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "morgan@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Morgan",
+        "last_name": "Blake",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_visa"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "77 Lakeshore Dr",
+        "city": "Milwaukee",
+        "region": "WI",
+        "postal_code": "53202",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_visa",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2025
+      },
+      {
+        "id": "pm_mc",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "8210",
+        "expiry_month": 5,
+        "expiry_year": 2028
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Morgan Blake, an AcmeBox customer. Your Visa card ending in 4242 is expiring soon and you want to switch your default payment method to your Mastercard ending in 8210.\n\nBehave like a real customer and follow this flow:\n- Open by saying your name and that you'd like to update your default payment method — your Visa is about to expire and you want to use your Mastercard instead.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it first.\n- If the agent lists your payment methods and asks which one you want as default, say the Mastercard ending in 8210.\n- Let the agent handle the update. You do not need to know the payment method IDs.\n- Once the agent confirms the Mastercard is now your default, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_payment_method_id": "pm_mc" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "paymentMethodId": "pm_mc" }
+        }
+      }
+    ]
+  },
+  "policy": "When a customer asks to change their default payment method, do not guess at a payment method ID. Before calling paymentMethods_setDefault, you MUST:\n1. Call paymentMethods_list to fetch the customer's current payment methods. Do this every time — paymentMethods_list is the authoritative source.\n2. Confirm with the customer which of the listed cards they mean (match by brand and last 4 digits).\n3. Only set as default a payment method that paymentMethods_list actually returned for that customer."
+}

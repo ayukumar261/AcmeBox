@@ -1,0 +1,107 @@
+{
+  "id": "switch_subscription_plan",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "casey@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Casey",
+        "last_name": "Morgan",
+        "locale": "en-US",
+        "timezone": "America/Denver",
+        "country": "US",
+        "default_address_id": "addr_1",
+        "default_payment_method_id": "pm_1",
+        "subscription_id": "sub_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "addr_1",
+        "customer_id": "cust_1",
+        "line1": "300 Mountain View Blvd",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80203",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "amex",
+        "last4": "0005",
+        "expiry_month": 11,
+        "expiry_year": 2029
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_basic",
+        "name": "Basic 2-Meal",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      },
+      {
+        "id": "plan_premium",
+        "name": "Premium 4-Meal",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 899,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_basic",
+        "delivery_day": "thursday",
+        "delivery_address_id": "addr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-02T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Casey Morgan, an AcmeBox subscriber currently on the Basic 2-Meal plan. Your household has grown and two meals a week isn't enough anymore — you'd like to upgrade to the Premium 4-Meal plan.\n\nBehave like a real customer and follow this flow:\n- Open the conversation by saying your name and that you'd like to upgrade your meal plan — you need more meals per week.\n- When the agent asks for your customer ID, provide it: cust_1. Don't volunteer it first.\n- If the agent lists the available plans, pick the one with 4 meals per week (the Premium 4-Meal plan).\n- Confirm the switch when the agent asks. You do not need to know plan or subscription IDs.\n- Once the agent confirms the plan switch, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "plan_id": "plan_premium" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_1" }
+        }
+      },
+      {
+        "tool": "plans_list",
+        "args": {}
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "planId": "plan_premium" }
+        }
+      }
+    ]
+  }
+}
