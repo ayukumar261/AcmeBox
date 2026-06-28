@@ -1,0 +1,107 @@
+{
+  "id": "refund_limit_exceeded",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_taylor",
+        "email": "taylor.kim@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Taylor",
+        "last_name": "Kim",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_payment_method_id": "pm_t1"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_t1",
+        "customer_id": "cust_taylor",
+        "brand": "visa",
+        "last4": "1111",
+        "expiry_month": 3,
+        "expiry_year": 2026
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_t_r1",
+        "customer_id": "cust_taylor",
+        "order_id": "ord_t_r1",
+        "subscription_id": "sub_t_prev",
+        "payment_method_id": "pm_t1",
+        "status": "refunded",
+        "amount": 5999,
+        "currency": "USD",
+        "refund_reason": "cracked eggs",
+        "processed_at": "2026-01-10T12:00:00Z",
+        "refunded_at": "2026-01-11T09:00:00Z"
+      },
+      {
+        "id": "pay_t_r2",
+        "customer_id": "cust_taylor",
+        "order_id": "ord_t_r2",
+        "subscription_id": "sub_t_prev",
+        "payment_method_id": "pm_t1",
+        "status": "refunded",
+        "amount": 5999,
+        "currency": "USD",
+        "refund_reason": "spoiled salmon",
+        "processed_at": "2026-03-05T12:00:00Z",
+        "refunded_at": "2026-03-06T14:00:00Z"
+      },
+      {
+        "id": "pay_t_r3",
+        "customer_id": "cust_taylor",
+        "order_id": "ord_t_r3",
+        "subscription_id": "sub_t_prev",
+        "payment_method_id": "pm_t1",
+        "status": "refunded",
+        "amount": 5999,
+        "currency": "USD",
+        "refund_reason": "rotten peppers",
+        "processed_at": "2026-05-12T12:00:00Z",
+        "refunded_at": "2026-05-13T11:00:00Z"
+      },
+      {
+        "id": "pay_t_cur",
+        "customer_id": "cust_taylor",
+        "order_id": "ord_t_cur",
+        "subscription_id": "sub_t_prev",
+        "payment_method_id": "pm_t1",
+        "status": "succeeded",
+        "amount": 5999,
+        "currency": "USD",
+        "processed_at": "2026-06-20T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Taylor Kim, an AcmeBox subscriber. Your last delivery included chicken thighs that were clearly spoiled -- they had a bad smell and were discolored. You want a refund.\n\nBehave like a real person:\n- Open with your name and the problem (e.g. \"Hi, I'm Taylor Kim. The chicken in my last AcmeBox box was spoiled and I want a refund.\").\n- When the agent asks for your customer ID, provide it: cust_taylor.\n- If asked about the problem: the chicken thighs smelled sour and had a grayish color when you opened the package.\n- You don't know you've already hit the refund limit. You just want a refund for this legitimate complaint.\n- If the agent tells you that you've reached a lifetime refund limit and can no longer receive refunds, express disappointment but accept their decision. Ask if there's anything else they can do, and accept gracefully if they say no.\n- Do NOT argue or claim you haven't had prior refunds -- the agent has access to the records."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_t_cur",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_taylor" }
+        }
+      },
+      {
+        "tool": "payments_list",
+        "args": {
+          "urlParams": { "customerId": "cust_taylor", "status": "refunded" }
+        }
+      }
+    ]
+  }
+}

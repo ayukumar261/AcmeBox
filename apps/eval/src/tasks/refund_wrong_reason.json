@@ -1,0 +1,62 @@
+{
+  "id": "refund_wrong_reason",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_morgan",
+        "email": "morgan.chen@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Morgan",
+        "last_name": "Chen",
+        "locale": "en-US",
+        "timezone": "America/Los_Angeles",
+        "country": "US",
+        "default_payment_method_id": "pm_m1"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_m1",
+        "customer_id": "cust_morgan",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 8,
+        "expiry_year": 2028
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_m1",
+        "customer_id": "cust_morgan",
+        "order_id": "ord_m_cur",
+        "subscription_id": "sub_m_prev",
+        "payment_method_id": "pm_m1",
+        "status": "succeeded",
+        "amount": 7199,
+        "currency": "USD",
+        "processed_at": "2026-06-19T12:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Morgan Chen, an AcmeBox subscriber. Your last delivery arrived two days late -- you ordered for June 19 but it didn't show up until June 21, which was really inconvenient. You're frustrated and want a refund.\n\nBehave like a real person:\n- Open with your name and the complaint (e.g. \"Hi, I'm Morgan Chen. My AcmeBox delivery was two days late and I'd like a refund.\").\n- When the agent asks for your customer ID, provide it: cust_morgan.\n- The reason for your complaint is ONLY late delivery, not ingredient quality. The food itself was fine.\n- If the agent refuses and explains that late delivery doesn't qualify, accept their explanation politely. You're disappointed but you understand.\n- Do NOT change your story to claim bad ingredients -- that's not what happened.\n- If the agent asks if there were any problems with the ingredients themselves, honestly say no, everything was fine aside from being late."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_m1",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": {
+          "path": { "customerId": "cust_morgan" }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "id": "browse_meals_and_change_plan",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      },
+      {
+        "id": "plan_2",
+        "name": "2 Meals Per Week",
+        "meals_per_week": 2,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 1099,
+        "active": true
+      },
+      {
+        "id": "plan_3",
+        "name": "6 Meals Per Week",
+        "meals_per_week": 6,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 899,
+        "active": true
+      },
+      {
+        "id": "plan_4",
+        "name": "8 Meals Per Week (Retired)",
+        "meals_per_week": 8,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 849,
+        "active": false
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "meals": [
+      {
+        "id": "meal_salmon",
+        "name": "Grilled Salmon with Asparagus",
+        "steps": ["Preheat oven to 400F", "Season salmon with lemon and dill", "Roast 15 minutes", "Serve with asparagus"],
+        "ingredients": ["salmon fillet", "asparagus", "lemon", "dill", "olive oil"],
+        "is_active": true
+      },
+      {
+        "id": "meal_chicken",
+        "name": "Herb-Crusted Chicken Breast",
+        "steps": ["Pound chicken thin", "Coat with herbs", "Pan-sear 6 minutes per side"],
+        "ingredients": ["chicken breast", "thyme", "rosemary", "garlic", "butter"],
+        "is_active": true
+      },
+      {
+        "id": "meal_pasta",
+        "name": "Creamy Mushroom Fettuccine",
+        "steps": ["Cook pasta al dente", "Saute mushrooms", "Make cream sauce", "Toss together"],
+        "ingredients": ["fettuccine", "mushrooms", "cream", "garlic", "parmesan"],
+        "is_active": true
+      },
+      {
+        "id": "meal_retired",
+        "name": "Discontinued Holiday Roast",
+        "steps": ["Brine roast overnight", "Roast low and slow"],
+        "ingredients": ["beef roast", "rosemary", "garlic"],
+        "is_active": false
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have TWO things to do in this chat, and you bring them up one at a time like a real person would:\n\n  (1) FIRST: you just want to browse this week's menu -- see all the meals you can actually pick from right now. You're only looking.\n  (2) THEN: you've decided you want bigger boxes, so you want to SWITCH your plan to the 6-meals-per-week plan. You're committing to this change in this conversation.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and ONLY the first request -- seeing this week's meals (e.g. \"Hi, this is Sam Rivera -- can you show me what meals are available this week?\"). Do NOT mention the plan change yet. Keep each message short and casual.\n- Don't list any meals yourself or ask about retired/discontinued dishes -- just let the agent tell you what's available right now.\n- Once the agent has given you the menu and asks whether there's anything else, THEN bring up the second request: switching to the 6-meals-per-week plan. (If the agent tries to wrap up without asking, go ahead and raise it yourself.)\n- For the plan change the agent will need to verify your account: when they ask for your customer ID, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal subscription or plan ID -- don't make one up. Refer to the plan you want the way a person would: \"the 6 meals a week one.\" Let the agent look up your subscription and the available plans.\n- This time you really do want the switch made (unlike just asking about options). Confirm clearly when the agent asks you to confirm.\n- Once the agent confirms you've been moved to the 6-meals-per-week plan, and there's nothing else, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "active", "plan_id": "plan_3" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "meals_list",
+        "args": { "urlParams": { "isActive": "true" } }
+      },
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "plans_list",
+        "args": {}
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "planId": "plan_3" }
+        }
+      }
+    ]
+  }
+}

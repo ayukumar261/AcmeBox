@@ -1,0 +1,138 @@
+{
+  "id": "cancel_pending_order_and_update_default_address",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_austin",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_austin",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      },
+      {
+        "id": "adr_denver",
+        "customer_id": "cust_1",
+        "line1": "900 Larimer St",
+        "city": "Denver",
+        "region": "CO",
+        "postal_code": "80202",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_austin",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "pending",
+        "address_id": "adr_austin",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-07-06T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": null,
+        "tracking_number": null
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have TWO separate things to handle in this chat, and you bring them up one at a time like a real person would:\n\n  (1) FIRST: your next box hasn't shipped yet and you've changed your mind -- you want to CANCEL that upcoming box. You do NOT want to cancel your whole subscription, just that one box.\n  (2) THEN: you've moved to Denver, so going forward you want your Denver address (900 Larimer St) set as your DEFAULT shipping address. Both your Austin and Denver addresses are already saved on the account.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and ONLY the first request -- canceling the upcoming box (e.g. \"Hi, this is Sam Rivera -- can you cancel my next box? It hasn't shipped yet.\"). Do NOT mention the address change yet. Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal order or address ID -- don't make one up. Let the agent look things up.\n- Be clear you only want to cancel the one upcoming box, not pause or cancel the subscription.\n- Once the agent has confirmed the box is canceled and asks whether there's anything else, THEN bring up the second request: making your Denver address your default going forward. (If the agent tries to wrap up without asking, go ahead and raise it yourself.)\n- When the agent asks which address, tell them your Denver place; read back 900 Larimer St, Denver, CO 80202 if they ask you to confirm the details. Don't recite the full address until they ask.\n- Once the agent has confirmed BOTH the canceled box and the new default address, and there's nothing else, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "orders",
+        "id": "ord_1",
+        "expect": { "status": "canceled" }
+      },
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_address_id": "adr_denver" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "orders_update",
+        "args": {
+          "path": { "orderId": "ord_1" },
+          "payload": { "status": "canceled" }
+        }
+      },
+      {
+        "tool": "addresses_list",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "addresses_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "addressId": "adr_denver" }
+        }
+      }
+    ]
+  }
+}

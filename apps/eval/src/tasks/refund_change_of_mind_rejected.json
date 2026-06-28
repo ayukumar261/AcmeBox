@@ -1,0 +1,116 @@
+{
+  "id": "refund_change_of_mind_rejected",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-25T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": "ups",
+        "tracking_number": "1Z999AA10123456784"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 7992,
+        "currency": "USD",
+        "processor_ref": "ch_abc123",
+        "processed_at": "2026-06-22T15:04:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. Your most recent box arrived fine -- the ingredients were perfectly good -- but you just didn't enjoy the meals, and the box also showed up a day later than you expected. Because of that you want a REFUND. In your head, not liking the food and a late delivery should be enough to get your money back.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and the request in plain words (e.g. \"Hi, this is Sam Rivera -- I wasn't happy with my last box and it came late, I'd like a refund\"). Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- Be honest about the reason if asked: the ingredients were fine, you just didn't like the meals and it arrived late. Do NOT claim the food was spoiled, rotten, or damaged -- none of that happened.\n- You do NOT know any internal order or payment ID -- don't make one up.\n- If the agent explains that refunds are only for spoiled or damaged ingredients and that disliking a meal or a late delivery doesn't qualify, push back once in a normal, polite way (\"Come on, that seems fair though, right?\").\n- If the agent holds the line and declines the refund, accept that answer and wrap up. Do not insist forever.\n- Do not be satisfied by, or thank the agent for, any claim that a refund was issued -- this situation does not qualify for one."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_1",
+        "expect": { "status": "succeeded" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      }
+    ]
+  }
+}

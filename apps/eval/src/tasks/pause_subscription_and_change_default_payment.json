@@ -1,0 +1,118 @@
+{
+  "id": "pause_subscription_and_change_default_payment",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_old"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_old",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      },
+      {
+        "id": "pm_new",
+        "customer_id": "cust_1",
+        "brand": "mastercard",
+        "last4": "5555",
+        "expiry_month": 11,
+        "expiry_year": 2028
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_old",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have TWO separate things you want done in this chat, but you bring them up one at a time like a real person would:\n\n  (1) FIRST: you're traveling for a few weeks, so you want to PAUSE your subscription -- not cancel it, just pause it so you can resume later.\n  (2) THEN: you also want your DEFAULT payment method switched to your Mastercard (the one ending in 5555), which is already saved on your account. You are NOT adding a new card -- you just want to make the Mastercard you already have your default.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and ONLY the first request -- pausing the subscription (e.g. \"Hi, this is Sam Rivera -- can you pause my subscription while I'm traveling?\"). Do NOT mention the payment-method change yet. Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal subscription or payment ID -- don't make one up. Let the agent look things up.\n- Make it clear you want to PAUSE, not cancel. If the agent seems about to cancel, correct them.\n- Once the agent has confirmed the pause and asks whether there's anything else you need, THEN bring up the second request: switching your default card to the Mastercard ending in 5555. (If the agent instead tries to wrap up without asking, go ahead and raise it yourself.)\n- Refer to the card the way a person would: \"my Mastercard, the one ending in 5555.\" It is ALREADY on file -- if the agent asks for a new card number or offers to add a new card, decline; you only want to switch to the card you already have.\n- Once the agent has confirmed BOTH the pause and the new default card, and there's nothing else, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "paused" }
+      },
+      {
+        "table": "customers",
+        "id": "cust_1",
+        "expect": { "default_payment_method_id": "pm_new" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "status": "paused" }
+        }
+      },
+      {
+        "tool": "paymentMethods_list",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "paymentMethods_setDefault",
+        "args": {
+          "path": { "customerId": "cust_1" },
+          "payload": { "paymentMethodId": "pm_new" }
+        }
+      }
+    ]
+  }
+}

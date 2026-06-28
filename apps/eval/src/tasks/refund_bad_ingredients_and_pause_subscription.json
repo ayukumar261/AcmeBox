@@ -1,0 +1,140 @@
+{
+  "id": "refund_bad_ingredients_and_pause_subscription",
+  "seed": {
+    "customers": [
+      {
+        "id": "cust_1",
+        "email": "sam@example.com",
+        "email_verified": true,
+        "phone_verified": false,
+        "first_name": "Sam",
+        "last_name": "Rivera",
+        "locale": "en-US",
+        "timezone": "America/Chicago",
+        "country": "US",
+        "default_address_id": "adr_1",
+        "default_payment_method_id": "pm_1"
+      }
+    ],
+    "addresses": [
+      {
+        "id": "adr_1",
+        "customer_id": "cust_1",
+        "line1": "123 Main St",
+        "city": "Austin",
+        "region": "TX",
+        "postal_code": "73301",
+        "country": "US"
+      }
+    ],
+    "payment_methods": [
+      {
+        "id": "pm_1",
+        "customer_id": "cust_1",
+        "brand": "visa",
+        "last4": "4242",
+        "expiry_month": 8,
+        "expiry_year": 2027
+      }
+    ],
+    "plans": [
+      {
+        "id": "plan_1",
+        "name": "4 Meals Per Week",
+        "meals_per_week": 4,
+        "servings_per_meal": 2,
+        "currency": "USD",
+        "country": "US",
+        "price_per_serving": 999,
+        "active": true
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "active",
+        "plan_id": "plan_1",
+        "delivery_day": "monday",
+        "delivery_address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "next_delivery_date": "2026-07-06T00:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "ord_1",
+        "subscription_id": "sub_1",
+        "customer_id": "cust_1",
+        "status": "delivered",
+        "address_id": "adr_1",
+        "payment_method_id": "pm_1",
+        "delivery_date": "2026-06-25T00:00:00Z",
+        "price": 7992,
+        "currency": "USD",
+        "items": [
+          { "mealId": "meal_salmon", "quantity": 2 },
+          { "mealId": "meal_chicken", "quantity": 2 }
+        ],
+        "carrier": "ups",
+        "tracking_number": "1Z999AA10123456784"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay_1",
+        "customer_id": "cust_1",
+        "order_id": "ord_1",
+        "subscription_id": "sub_1",
+        "payment_method_id": "pm_1",
+        "status": "succeeded",
+        "amount": 7992,
+        "currency": "USD",
+        "processor_ref": "ch_abc123",
+        "processed_at": "2026-06-22T15:04:00Z"
+      }
+    ]
+  },
+  "user": {
+    "instructions": "You are Sam Rivera, an ordinary AcmeBox meal-kit customer messaging support. You have TWO things to handle in this chat, and you bring them up one at a time like a real person would:\n\n  (1) FIRST: your most recent box arrived with spoiled ingredients -- the chicken smelled off and the tomatoes were rotten and moldy. You want a REFUND for that box.\n  (2) THEN: after that's sorted, you also want to PAUSE your subscription for a while -- you're going to be away and you don't want more boxes for now. You are NOT canceling it, just pausing so you can resume later.\n\nBehave like a real person, not a database, and follow this flow:\n- Open with your name and ONLY the first issue -- the spoiled box and wanting a refund (e.g. \"Hi, this is Sam Rivera -- my last box came with spoiled chicken and moldy tomatoes, I'd like a refund\"). Do NOT mention pausing yet. Keep each message short and casual.\n- When the agent asks for your customer ID to look up your account, give it: cust_1. Don't volunteer it before they ask.\n- You do NOT know any internal order, payment, or subscription ID -- don't make one up. Let the agent look things up.\n- If the agent asks what was wrong, be specific that the ingredients were spoiled/rotten (not that you simply disliked the meal or that it was late).\n- Once the agent has confirmed the refund and asks whether there's anything else, THEN bring up the second request: pausing your subscription. (If the agent tries to wrap up without asking, go ahead and raise it yourself.)\n- Make it clear you want to PAUSE, not cancel. If the agent seems about to cancel, correct them -- you want to be able to come back.\n- Once the agent has confirmed BOTH the refund and that your subscription is paused, and there's nothing else, you're satisfied and done."
+  },
+  "evaluation_criteria": {
+    "db_check": [
+      {
+        "table": "payments",
+        "id": "pay_1",
+        "expect": { "status": "refunded" }
+      },
+      {
+        "table": "subscriptions",
+        "id": "sub_1",
+        "expect": { "status": "paused" }
+      }
+    ],
+    "tools": [
+      {
+        "tool": "customers_getById",
+        "args": { "path": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "payments_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "payments_refund",
+        "args": { "path": { "paymentId": "pay_1" } }
+      },
+      {
+        "tool": "subscriptions_list",
+        "args": { "urlParams": { "customerId": "cust_1" } }
+      },
+      {
+        "tool": "subscriptions_update",
+        "args": {
+          "path": { "subscriptionId": "sub_1" },
+          "payload": { "status": "paused" }
+        }
+      }
+    ]
+  }
+}
