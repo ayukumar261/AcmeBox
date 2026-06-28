@@ -1,0 +1,39 @@
+meta {
+  name: Settle Payment — Failed
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/payments/{{payPaymentIdB}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "failed",
+    "failureReason": "Card declined: insufficient funds"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq failed
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("moves the payment to failed and records the failure reason", function () {
+    const body = res.getBody();
+    expect(body.status).to.equal("failed");
+    expect(body.failureReason).to.equal("Card declined: insufficient funds");
+  });
+
+  test("stamps processedAt automatically when the charge settles as failed", function () {
+    expect(res.getBody().processedAt).to.be.a("string");
+  });
+}

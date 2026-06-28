@@ -1,0 +1,37 @@
+meta {
+  name: Setup Plan
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/plans
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "2 recipes · 2 servings",
+    "mealsPerWeek": 2,
+    "servingsPerMeal": 2,
+    "currency": "USD",
+    "country": "US",
+    "pricePerServing": 999
+  }
+}
+
+script:post-response {
+  bru.setVar("payPlanId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the fixture plan", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^plan_/);
+  });
+}

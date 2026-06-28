@@ -1,0 +1,33 @@
+meta {
+  name: Refund Payment — Not Found
+  type: http
+  seq: 22
+}
+
+post {
+  url: {{baseUrl}}/payments/pay_nonexistent_00000000/refund
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "reason": "This payment does not exist"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq PaymentNotFound
+}
+
+tests {
+  test("returns 404 for a nonexistent payment id", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns the PaymentNotFound error tag", function () {
+    expect(res.getBody()._tag).to.equal("PaymentNotFound");
+    expect(res.getBody().paymentId).to.equal("pay_nonexistent_00000000");
+  });
+}

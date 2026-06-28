@@ -1,0 +1,42 @@
+meta {
+  name: Setup Order
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "subscriptionId": "{{paySubscriptionId}}",
+    "addressId": "{{payAddressId}}",
+    "paymentMethodId": "{{payPaymentMethodId}}",
+    "deliveryDate": "2026-07-15T00:00:00Z",
+    "price": 3996,
+    "currency": "USD",
+    "items": [
+      { "mealId": "{{payMealAId}}", "quantity": 1 },
+      { "mealId": "{{payMealBId}}", "quantity": 1 }
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("payOrderId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the primary fixture order", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^ord_/);
+    expect(res.getBody().status).to.equal("pending");
+  });
+}

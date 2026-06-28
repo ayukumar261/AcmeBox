@@ -1,0 +1,43 @@
+meta {
+  name: Settle Payment — Succeeded
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseUrl}}/payments/{{payPaymentId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "succeeded",
+    "processorRef": "ch_test_3MXTpbGZ7GxRpq",
+    "processedAt": "2026-07-15T12:00:00Z"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq succeeded
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("moves the payment to succeeded and records the processor reference", function () {
+    const body = res.getBody();
+    expect(body.status).to.equal("succeeded");
+    expect(body.processorRef).to.equal("ch_test_3MXTpbGZ7GxRpq");
+    expect(body.processedAt).to.equal("2026-07-15T12:00:00Z");
+  });
+
+  test("amount and currency remain frozen — not changed by the settle patch", function () {
+    const body = res.getBody();
+    expect(body.amount).to.equal(3996);
+    expect(body.currency).to.equal("USD");
+  });
+}

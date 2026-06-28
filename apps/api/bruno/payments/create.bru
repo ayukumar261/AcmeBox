@@ -1,0 +1,57 @@
+meta {
+  name: Create Payment
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/payments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "orderId": "{{payOrderId}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("payPaymentId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq pending
+}
+
+tests {
+  test("responds with 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("returns a branded payment id and starts in pending status", function () {
+    const body = res.getBody();
+    expect(body.id).to.match(/^pay_/);
+    expect(body.status).to.equal("pending");
+  });
+
+  test("derives customer, subscription, amount, and currency from the order — never trusts the client", function () {
+    const body = res.getBody();
+    expect(body.customerId).to.equal(bru.getVar("payCustomerId"));
+    expect(body.subscriptionId).to.equal(bru.getVar("paySubscriptionId"));
+    expect(body.orderId).to.equal(bru.getVar("payOrderId"));
+    expect(body.paymentMethodId).to.equal(bru.getVar("payPaymentMethodId"));
+    expect(body.amount).to.equal(3996);
+    expect(body.currency).to.equal("USD");
+  });
+
+  test("leaves processor and settlement fields absent while charge is pending", function () {
+    const body = res.getBody();
+    expect(body.processorRef).to.equal(undefined);
+    expect(body.processedAt).to.equal(undefined);
+    expect(body.failureReason).to.equal(undefined);
+    expect(body.refundedAt).to.equal(undefined);
+    expect(body.refundReason).to.equal(undefined);
+  });
+}

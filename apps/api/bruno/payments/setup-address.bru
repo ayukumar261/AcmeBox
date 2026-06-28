@@ -1,0 +1,36 @@
+meta {
+  name: Setup Address
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/customers/{{payCustomerId}}/addresses
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "line1": "123 Main St",
+    "city": "Chicago",
+    "region": "IL",
+    "postalCode": "60601",
+    "country": "US"
+  }
+}
+
+script:post-response {
+  bru.setVar("payAddressId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the fixture address", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^adr_/);
+  });
+}

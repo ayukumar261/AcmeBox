@@ -1,0 +1,35 @@
+meta {
+  name: Settle Payment — Invalid Transition
+  type: http
+  seq: 19
+}
+
+patch {
+  url: {{baseUrl}}/payments/{{payPaymentIdB}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "succeeded"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq InvalidPaymentTransition
+}
+
+tests {
+  test("returns 409 when attempting to move out of a terminal state", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("returns InvalidPaymentTransition with from=failed and to=succeeded", function () {
+    const body = res.getBody();
+    expect(body._tag).to.equal("InvalidPaymentTransition");
+    expect(body.from).to.equal("failed");
+    expect(body.to).to.equal("succeeded");
+  });
+}

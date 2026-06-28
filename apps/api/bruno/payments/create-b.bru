@@ -1,0 +1,34 @@
+meta {
+  name: Create Payment B
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/payments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "orderId": "{{payOrderIdB}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("payPaymentIdB", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+  res.body.status: eq pending
+}
+
+tests {
+  test("creates a second pending payment (will be settled as failed)", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^pay_/);
+    expect(res.getBody().orderId).to.equal(bru.getVar("payOrderIdB"));
+  });
+}

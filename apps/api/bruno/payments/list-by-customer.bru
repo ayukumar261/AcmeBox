@@ -1,0 +1,31 @@
+meta {
+  name: List Payments By Customer
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/payments?customerId={{payCustomerId}}
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns an array containing both fixture payments", function () {
+    const ids = res.getBody().map((p) => p.id);
+    expect(ids).to.include(bru.getVar("payPaymentId"));
+    expect(ids).to.include(bru.getVar("payPaymentIdB"));
+  });
+
+  test("every result belongs to the queried customer", function () {
+    const uniqueCustomerIds = [...new Set(res.getBody().map((p) => p.customerId))];
+    expect(uniqueCustomerIds).to.eql([bru.getVar("payCustomerId")]);
+  });
+}

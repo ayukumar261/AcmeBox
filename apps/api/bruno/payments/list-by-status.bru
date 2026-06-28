@@ -1,0 +1,32 @@
+meta {
+  name: List Payments By Status
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/payments?customerId={{payCustomerId}}&status=pending
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns only pending payments for this customer", function () {
+    const body = res.getBody();
+    expect(body.length).to.be.greaterThan(0);
+    body.forEach((p) => expect(p.status).to.equal("pending"));
+  });
+
+  test("includes both fixture payments (both still pending at this point in the sequence)", function () {
+    const ids = res.getBody().map((p) => p.id);
+    expect(ids).to.include(bru.getVar("payPaymentId"));
+    expect(ids).to.include(bru.getVar("payPaymentIdB"));
+  });
+}

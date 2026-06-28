@@ -1,0 +1,41 @@
+meta {
+  name: Setup Meal B
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Butternut Squash Soup",
+    "steps": [
+      "Roast squash halves at 375°F for 40 minutes.",
+      "Scoop flesh, blend with stock, season to taste."
+    ],
+    "ingredients": [
+      "1 butternut squash",
+      "500ml vegetable stock",
+      "1 onion"
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("payMealBId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates fixture meal B", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^meal_/);
+  });
+}

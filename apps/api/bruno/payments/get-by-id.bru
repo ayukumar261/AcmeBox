@@ -1,0 +1,34 @@
+meta {
+  name: Get Payment By Id
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/payments/{{payPaymentId}}
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{payPaymentId}}
+  res.body.status: eq pending
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("returns the full payment record with all denormalized fields", function () {
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getVar("payPaymentId"));
+    expect(body.customerId).to.equal(bru.getVar("payCustomerId"));
+    expect(body.orderId).to.equal(bru.getVar("payOrderId"));
+    expect(body.subscriptionId).to.equal(bru.getVar("paySubscriptionId"));
+    expect(body.paymentMethodId).to.equal(bru.getVar("payPaymentMethodId"));
+    expect(body.amount).to.equal(3996);
+    expect(body.currency).to.equal("USD");
+    expect(body.status).to.equal("pending");
+  });
+}

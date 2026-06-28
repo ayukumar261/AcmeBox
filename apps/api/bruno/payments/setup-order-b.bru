@@ -1,0 +1,41 @@
+meta {
+  name: Setup Order B
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "subscriptionId": "{{paySubscriptionId}}",
+    "addressId": "{{payAddressId}}",
+    "paymentMethodId": "{{payPaymentMethodId}}",
+    "deliveryDate": "2026-07-22T00:00:00Z",
+    "price": 3996,
+    "currency": "USD",
+    "items": [
+      { "mealId": "{{payMealAId}}", "quantity": 2 }
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("payOrderIdB", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates a second fixture order (used for the failed-payment path)", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^ord_/);
+    expect(res.getBody().status).to.equal("pending");
+  });
+}

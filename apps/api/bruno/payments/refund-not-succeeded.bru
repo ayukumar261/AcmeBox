@@ -1,0 +1,35 @@
+meta {
+  name: Refund Payment — Not Succeeded
+  type: http
+  seq: 21
+}
+
+post {
+  url: {{baseUrl}}/payments/{{payPaymentIdB}}/refund
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "reason": "Attempting to refund a charge that never succeeded"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body._tag: eq InvalidPaymentTransition
+}
+
+tests {
+  test("returns 409 when trying to refund a non-succeeded payment", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("returns InvalidPaymentTransition with from=failed and to=refunded", function () {
+    const body = res.getBody();
+    expect(body._tag).to.equal("InvalidPaymentTransition");
+    expect(body.from).to.equal("failed");
+    expect(body.to).to.equal("refunded");
+  });
+}

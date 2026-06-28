@@ -1,0 +1,33 @@
+meta {
+  name: Create Payment — Unknown Order
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/payments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "orderId": "ord_nonexistent_00000000"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body._tag: eq OrderNotFound
+}
+
+tests {
+  test("returns 404 for a nonexistent order id", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("returns the OrderNotFound error tag", function () {
+    expect(res.getBody()._tag).to.equal("OrderNotFound");
+    expect(res.getBody().orderId).to.equal("ord_nonexistent_00000000");
+  });
+}

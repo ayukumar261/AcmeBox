@@ -1,0 +1,41 @@
+meta {
+  name: Setup Meal A
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/meals
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Lemon Herb Chicken",
+    "steps": [
+      "Marinate chicken in lemon juice and herbs for 30 minutes.",
+      "Roast at 400°F for 25 minutes until golden."
+    ],
+    "ingredients": [
+      "2 chicken breasts",
+      "1 lemon",
+      "Fresh rosemary and thyme"
+    ]
+  }
+}
+
+script:post-response {
+  bru.setVar("payMealAId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates fixture meal A", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^meal_/);
+  });
+}

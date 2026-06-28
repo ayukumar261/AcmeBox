@@ -1,0 +1,44 @@
+meta {
+  name: Refund Payment
+  type: http
+  seq: 20
+}
+
+post {
+  url: {{baseUrl}}/payments/{{payPaymentId}}/refund
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "reason": "Spoiled ingredients — bag of spinach was wilted on arrival"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq refunded
+}
+
+tests {
+  test("responds with 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("moves the payment to refunded and records the reason", function () {
+    const body = res.getBody();
+    expect(body.status).to.equal("refunded");
+    expect(body.refundReason).to.equal("Spoiled ingredients — bag of spinach was wilted on arrival");
+  });
+
+  test("stamps refundedAt on the record", function () {
+    expect(res.getBody().refundedAt).to.be.a("string");
+  });
+
+  test("amount and currency remain frozen after refund", function () {
+    const body = res.getBody();
+    expect(body.amount).to.equal(3996);
+    expect(body.currency).to.equal("USD");
+  });
+}

@@ -1,0 +1,43 @@
+meta {
+  name: Setup Customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{payEmail}}",
+    "firstName": "Marion",
+    "lastName": "Jones",
+    "locale": "en-US",
+    "timezone": "America/Chicago",
+    "country": "US"
+  }
+}
+
+script:pre-request {
+  // Self-contained: this folder owns its own customer / address / card / plan /
+  // subscription / meals / orders so it can run independently.
+  bru.setVar("payEmail", `pay-${Date.now()}@example.com`);
+}
+
+script:post-response {
+  bru.setVar("payCustomerId", res.getBody().id);
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("creates the fixture customer", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.match(/^cus_/);
+  });
+}
