@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { MessageCircle, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ChatPanel } from "./ChatPanel";
-import { FeedbackCard, type ConversationRating } from "./FeedbackCard";
 
 /**
  * Conversation lifecycle hooks. Client-only for now — no persistence — but
@@ -16,9 +15,6 @@ import { FeedbackCard, type ConversationRating } from "./FeedbackCard";
 function trackConversation(event: "start" | "end") {
   console.info(`[chat] conversation ${event}`);
 }
-function trackFeedback(rating: ConversationRating) {
-  console.info(`[chat] conversation rated: ${rating}`);
-}
 
 /**
  * Floating support widget pinned to the bottom-right corner. A blue launcher
@@ -26,21 +22,59 @@ function trackFeedback(rating: ConversationRating) {
  *
  * The conversation lifecycle lives here: it "starts" on the first message and
  * "ends" when the user closes the widget via either X (the panel header or the
- * launcher). On end, if there was a real exchange, the card swaps to a quick
- * feedback prompt before collapsing; afterwards the conversation is reset so the
+ * launcher) after a real exchange. On close the conversation is reset so the
  * next open starts fresh.
  */
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<"chat" | "feedback">("chat");
   // Defers the post-close reset until the collapse animation finishes.
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Identity/timing for the current conversation, persisted to MongoDB on end.
+  const conversationIdRef = useRef<string | null>(null);
+  const startedAtRef = useRef<number | null>(null);
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
 
   const hasConversation = messages.length > 0;
+
+  // Always reflects the latest messages so persistence (including the unload
+  // listener, which binds once) reads a fresh snapshot without re-binding.
+  const messagesRef = useRef(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  // Save the full transcript to MongoDB via the conversations route. Reads only
+  // refs, so it's stable and safe to call from an event listener. `keepalive`
+  // lets the POST outlive a widget unmount or page unload; the route upserts by
+  // conversationId, so a double-fire (close + pagehide) won't duplicate.
+  const persistConversation = useCallback(() => {
+    const conversationId = conversationIdRef.current;
+    const snapshot = messagesRef.current;
+    if (!conversationId || snapshot.length === 0) return;
+    const body = JSON.stringify({
+      conversationId,
+      startedAt: new Date(startedAtRef.current ?? Date.now()).toISOString(),
+      endedAt: new Date().toISOString(),
+      messages: snapshot,
+    });
+    void fetch("/api/conversations", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body,
+      keepalive: true,
+    }).catch((err) => console.error("[chat] persist failed", err));
+  }, []);
+
+  // Catch the case where the user closes the tab / navigates away mid-chat
+  // without closing the widget first — requestClose never runs then.
+  useEffect(() => {
+    const onPageHide = () => persistConversation();
+    window.addEventListener("pagehide", onPageHide);
+    return () => window.removeEventListener("pagehide", onPageHide);
+  }, [persistConversation]);
 
   function clearResetTimer() {
     if (resetTimer.current) {
@@ -51,7 +85,6 @@ export function ChatWidget() {
 
   function openChat() {
     clearResetTimer();
-    setView("chat");
     setOpen(true);
   }
 
@@ -61,31 +94,29 @@ export function ChatWidget() {
     clearResetTimer();
     setOpen(false);
     resetTimer.current = setTimeout(() => {
-      setView("chat");
       setMessages([]);
+      conversationIdRef.current = null;
+      startedAtRef.current = null;
       resetTimer.current = null;
     }, 200);
   }
 
   function handleSend(text: string) {
-    if (messages.length === 0) trackConversation("start");
+    if (messages.length === 0) {
+      conversationIdRef.current = crypto.randomUUID();
+      startedAtRef.current = Date.now();
+      trackConversation("start");
+    }
     sendMessage({ text });
-  }
-
-  function handleRate(rating: ConversationRating) {
-    trackFeedback(rating);
-    // Let the card show its "thanks" state briefly, then collapse.
-    clearResetTimer();
-    resetTimer.current = setTimeout(finishClose, 1100);
   }
 
   // Both close affordances (panel header X and launcher X) funnel here.
   function requestClose() {
     if (status === "streaming" || status === "submitted") stop();
-    if (view === "chat" && hasConversation) {
+    if (hasConversation) {
       trackConversation("end");
-      setView("feedback");
-      return;
+      // Capture synchronously — finishClose schedules a setMessages([]) reset.
+      persistConversation();
     }
     finishClose();
   }
@@ -101,17 +132,13 @@ export function ChatWidget() {
         )}
         aria-hidden={!open}
       >
-        {view === "feedback" ? (
-          <FeedbackCard onRate={handleRate} onDismiss={finishClose} />
-        ) : (
-          <ChatPanel
-            messages={messages}
-            status={status}
-            stop={stop}
-            onSend={handleSend}
-            onClose={requestClose}
-          />
-        )}
+        <ChatPanel
+          messages={messages}
+          status={status}
+          stop={stop}
+          onSend={handleSend}
+          onClose={requestClose}
+        />
       </div>
 
       <button
